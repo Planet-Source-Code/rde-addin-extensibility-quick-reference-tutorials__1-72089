@@ -1,0 +1,40 @@
+
+Where on Earth is an Add-ins's Description
+
+In VB6 you'll find it in the Connect Designer under Addin Display Name.
+Requires a reference to the Microsoft Add-In Designer library.
+
+If in VB4 or you are implementing IDTExtensibility in a VB5 class:
+
+The VB2TheMax Team
+
+Every now and then someone asks me
+
+"How can I modify the default description that is associated to an add-in
+I have written and that appears in the Add-In Manager? I tried to modify
+the Project's Description attribute, but it didn't work". 
+
+The answer is simple, even though this detail is not documented in the VB
+manuals and when I wrote my first add-in I had to load the source code into
+Notepad to understand what to do. 
+
+The description that appears in the Add-In Manager window is actually the
+Description attribute of the Connect class of the add-in, not of the project.
+
+While this might be absurd, it has some logic: theoretically, an add-in
+project might include several Connect class, each one corresponding to a
+separate add-in utility (I say theoretically because I don't see any use
+in doing that...), therefore the add-in's description is actually an
+attribute of the class, not of the project.
+
+Even when I understood what the add-in's description corresponds to, I had
+to find out how to modify it from within the Visual Basic environment.
+
+While you can modify the description of a property or a method from within
+the Procedure Attributes dialog invoked from the Tools menu, you can't do the
+same for the attribute of a class. To access the proper dialog box you must: 
+
+(1) press F2 to show the Object Browser, 
+(2) right-click on the class name in the left-most pane, and 
+(3) select the Properties item in the popup menu that appears. 
+ 

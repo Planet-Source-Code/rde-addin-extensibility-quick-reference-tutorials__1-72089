@@ -1,0 +1,477 @@
+VERSION 5.00
+Begin {AC0714F6-3D04-11D1-AE7D-00A0C90F26F4} dsrConnect 
+   ClientHeight    =   9945
+   ClientLeft      =   1740
+   ClientTop       =   1545
+   ClientWidth     =   6585
+   _ExtentX        =   11615
+   _ExtentY        =   17542
+   _Version        =   393216
+   Description     =   "Add-In Project Template"
+   DisplayName     =   "My Add-In"
+   AppName         =   "Visual Basic"
+   AppVer          =   "Visual Basic 98 (ver 6.0)"
+   LoadName        =   "Command Line / Startup"
+   LoadBehavior    =   5
+   RegLocation     =   "HKEY_CURRENT_USER\Software\Microsoft\Visual Basic\6.0"
+   CmdLineSupport  =   -1  'True
+End
+Attribute VB_Name = "dsrConnect"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = True
+Option Explicit
+
+' Project references:
+'     Microsoft Add-In Designer
+'     Microsoft Visual Basic 6.0 Extensibility
+'     Microsoft Office 8.0 Object Library
+
+' Form level variables
+Private WithEvents MenuHandler As CommandBarEvents
+Attribute MenuHandler.VB_VarHelpID = -1
+Private WithEvents CtrlHandler As VBControlsEvents
+Attribute CtrlHandler.VB_VarHelpID = -1
+
+' From MSDN Library - Periodicals 1997 - Roll Your Own Add-Ins
+
+' THE OBJECT TREE
+
+' The IDTExtensibility class is included in the type library, but the
+' VB6 IDE does not expose any object of this type. Instead, the class
+' defines the interface that add-ins must implement to integrate with
+' the VB environment. The add-in must include a public class, but the
+' class's name is not important, as long as it includes this statement:
+
+Implements IDTExtensibility
+
+' The IDTExtensibility class includes four methods that the VB5 IDE calls
+' to notify the add-in of important events: OnAddinsUpdate, OnConnection,
+' OnDisconnection, and OnStartupComplete. The most important method,
+' OnConnection, is called when the user starts the add-in from the Add-In
+' Manager dialog box:
+
+Sub IDTExtensibility_OnConnection(ByVal VBInst As Object, _
+                                  ByVal Mode As vbext_ConnectMode, _
+                                  ByVal AddInInst As VBIDE.AddIn, _
+                                  Custom() As Variant)
+
+' The VBInst object passed as the first argument is the instance of the
+' Visual Basic Environment (VBE) object that is at the top of the VB IDE
+' object tree. The add-in must save a reference to the particular instance
+' of the VB environment that has just installed into the VBInstance class
+' property. Note that you can't use a global variable because the same
+' add-in may serve multiple VB instances.
+
+' You need this object to access all the items in the hierarchy, and I use
+' it in all the code examples that follow.
+
+End Sub
+
+' VB6 Add-Ins can now reference the Microsoft Add-In Designer which exposes
+' the AddInDesignerObjects library, which implements the AddinInstance class
+' that offers real events (not methods as is the case with IDTExtensibility)
+' and includes another event OnBeginShutdown. No 'Implements' is required.
+
+Sub AddinInstance_OnConnection(ByVal VBInst As Object, _
+                               ByVal ConnectMode As AddInDesignerObjects.ext_ConnectMode, _
+                               ByVal AddInInst As Object, _
+                               Custom() As Variant)
+End Sub
+
+Sub AddinInstance_OnDisconnection(ByVal RemoveMode As AddInDesignerObjects.ext_DisconnectMode, _
+                                  Custom() As Variant)
+    ' Occurs when an add-in is disconnected from the Visual Basic IDE, either
+    ' programmatically or through the Add-In Manager dialog box
+End Sub
+
+Sub AddinInstance_OnStartupComplete(Custom() As Variant)
+    'Occurs when the startup of the Visual Basic IDE is complete
+End Sub
+
+Sub AddinInstance_OnAddInsUpdate(Custom() As Variant)
+    ' Occurs automatically when changes to the Vbaddin.Ini file are saved
+End Sub
+
+Sub AddinInstance_OnBeginShutdown(Custom() As Variant)
+    ' Occurs immediately before shutting down the environment
+End Sub
+
+' Just below the VBE object are six collections and a few other objects
+' that enable you to leverage all the features of the environment.
+
+' The Windows collection holds all the windows used by the environment,
+' except the main MDI window. You cannot add or remove items from this
+' collection, but you can use their properties and methods to move, resize,
+' hide, minimize, maximize, and close all windows in the IDE.
+
+' VB lets you dock and group its windows together, and a window is linked
+' to other windows that share the same frame. If the window is not docked,
+' its LinkedWindowFrame property returns Nothing.
+
+' Otherwise, you can enumerate the frame's LinkedWindows collection to
+' access all the companion windows in the same frame. The members of this
+' collection are other Window objects, so you are actually exploring a
+' recursive tree.
+
+' Note that you cannot dock code and designer windows, the Object Browser,
+' or the Search and Replace dialogs. Use the Type property to learn which
+' kind of window you're dealing with.
+
+' For example, you can write a short routine that minimizes all the
+' designer windows in the environment:
+
+Sub dummy()
+
+    Dim w As VBIDE.Window
+    For Each w In VBInstance.Windows
+        If w.Type = vbext_wt_Designer Then
+            w.WindowState = vbext_ws_Minimize
+        End If
+    Next
+
+' The Addins collection represents all the add-ins that are registered in
+' the environment. You can access each Addin object, query its Guid and
+' ProgId properties, and activate or deactivate each object using the
+' Connect property.
+
+' However, the Addins collection is useful only for debugging or creating
+' an alternative add-in manager; I won't cover its details in this article.
+
+' MANIPULATE WINDOWS' CONTENTS
+
+' The CodePanes collection includes all the code windows open in a given
+' environment. You can use each CodePane object to scroll a window's contents,
+' select text and copy it to the Clipboard, alternate between full module
+' and procedure view, and learn how many lines are visible.
+
+' However, you cannot directly modify the code using a CodePane object.
+' Instead, you must use the CodeModule object exposed by the property with
+' the same name.
+
+' Every CodePane object exposes a Window object, which represents the
+' physical window seen by the user.
+
+' For example, this short code snippet fills a list box with the caption of
+' every CodePane object, then scrolls its window to the first line of code:
+
+    Dim cp As VBIDE.CodePane
+    For Each cp In VBInstance.CodePanes
+        List1.AddItem cp.Window.Caption
+        cp.TopLine = 1
+    Next
+
+' The CommandBars collection belongs to an external library, the Microsoft
+' Office 8.0 Object Library. A CommandBar object unifies the concept of menus
+' and command buttons, and can include other CommandBar objects, much as a
+' menu can include one or more submenus. Each CommandBar object exposes a
+' Control property that returns a CommandBarControls collection composed of
+' CommandBar objects - just another example of recursion in the object model.
+
+' The first CommandBar object in the IDE is the menu bar, so you can address
+' any menu of the environment:
+
+    Dim cb As Office.CommandBar
+    Dim cbc1 As Office.CommandBarControl
+    Dim cbc2 As Office.CommandBarControl
+    Dim cbc3 As Office.CommandBarControl
+
+    List1.Clear
+    ' Iterate on all the command bars in the IDE
+    For Each cb In VBInstance.CommandBars
+        List1.AddItem cb.Name
+
+        ' Every command bar has a collection of controls
+        For Each cbc1 In cb.Controls
+            List1.AddItem vbTab & cbc.Caption
+
+            ' CommandBarPopup is a type of CommandBarControls
+            If TypeOf cbc1 Is Office.CommandBarPopup Then
+                ' iterate on all the items of menus
+                For Each cbc2 In cbc1.Controls
+                    List1.AddItem vbTab & vbTab & cbc2.Caption
+
+                    ' If this is a submenu itself, iterate on its items too
+                    If TypeOf cbc2 Is Office.CommandBarPopup Then
+                        For Each cbc3 In cbc2.Controls
+                            List1.AddItem vbTab & vbTab & vbTab & cbc3.Caption
+                        Next
+                    End If
+                Next
+            End If
+        Next
+    Next
+
+' For example, your add-in can learn the current state of the program
+' under development:
+
+    Dim mbc As Office.CommandBarControl
+    Set mbc = VBInstance.CommandBars(1).Controls("Run").Controls(1)
+
+    If mbc.Enabled = False Then
+        Print "Executing"
+    ElseIf mbc.Caption = "&Start" Then
+        Print "Design Mode"
+    ElseIf mbc.Caption = "&Continue" Then
+        Print "Break Mode"
+    End If
+
+' A brief explanation is necessary: the first control on the Run menu is
+' the "Start" item, which is disabled if the program is in run mode. The
+' control's caption changes to "Continue" in break mode.
+
+' Even more interesting, you can "click" on any menu item or toolbar button
+' using the Execute method of the CommandBarControl object.
+
+' For example, you can stop the running application with this statement:
+
+    VBInstance.CommandBars(1).Controls("Run").Controls("Break").Execute
+
+' and resume execution with:
+
+    VBInstance.CommandBars(1).Controls("Run").Controls("Continue").Execute
+
+' Accessing buttons on toolbars isn't difficult either. For example, you can
+' show the Open Project dialog box using this command:
+
+    VBInstance.CommandBars("Standard").Controls("Open Project...").Execute
+
+' Note that you should probably reference a menu or toolbar item using its
+' name, rather than its numerical index. This protects you when a user
+' customizes the menu or the toolbar. You also need to match the caption
+' perfectly, including any trailing ellipses.
+
+' You can omit the "&" character, however.
+
+' ACCESS FORM AND CODE ITEMS
+
+' You can find the most interesting part of the VB IDE object model if you
+' travel down the the VBProjects path. Each item of this collection is a
+' project currently loaded in the environment; you can also directly
+' reference the active project through the VBInstance.ActiveProject property.
+
+' Each VBProject object exposes properties and methods that let you save the
+' corresponding project, set its help file or description, and more. The most
+' interesting use of this object is to enumerate its components through the
+' VBComponents collection that gathers all the form, code, class modules, and
+' so on.
+
+' VBComponents' objects can store their contents in one single file, as in the
+' case of standard and class modules, or in two distinct files. For example,
+' forms use both FRM and FRX files. You can detect the number of files used
+' with the FileCount property, and learn their path using the FileNames
+' property. You can query whether the component has been modified (property
+' IsDirty), and you can even save it to disk (method SaveAs).
+
+' If the component corresponds to a visible object, you can read and modify
+' its settings using the Properties collection:
+
+    ' Set the BackColor of the current selected component
+    VBInstance.SelectedVBComponent.Properties("BackColor") = vbGray
+
+' You can access the code in each component with the CodeModule object, whose
+' properties and methods allow you to read any single procedure and declaration
+' in the module, find a given string, replace a block of lines, add new lines,
+' and so on.
+
+' If you need to enumerate all the items in a code module - variable, methods,
+' procedures, and constants - you must go one level deeper in the object tree.
+' The Members collection serves exactly this purpose. Not only does it return
+' the name and type of each item, but it also lets you read and modify the
+' item's attributes, such as its description, HelpContextID, ProcedureID, and
+' all the information that you enter in the Procedure Attributes dialog box.
+
+' A number of component types, including UserControls and UserDocuments, also
+' have a visible interface. You can access the corresponding designer using
+' the Designer property, which returns a VBForm object. You can do a lot of
+' interesting things with this object, such as iterating through the controls
+' it contains:
+
+    ' List all the controls on the selected Form (or UserControl or UserDocument)
+    Dim frm As VBIDE.VBForm
+    Dim ctr As VBIDE.VBControl
+
+    Set frm = VBInstance.SelectedVBComponent.Designer
+    For Each ctr In frm.VBControls
+        List1.AddItem ctr.ClassName & " " & ctr.Properties("Name")
+    Next
+
+' Each VBForm object exposes three collections: VBControls, which includes all
+' the controls on the form; ContainedVBControls, which includes the controls
+' placed on the form's surface; and SelectedVBControls, the controls that are
+' currently selected. Changing a property in all the selected controls is
+' relatively easy:
+
+    ' Same variables as the previous example
+    For Each ctr In frm.SelectedVBControls
+        ctr.Properties("Tag") = ""
+    Next
+End Sub
+
+' If a control can act as a container - as is the case with picture boxes
+' and frames - it exposes a ContainedVBControls collection. This collection
+' holds one or more VBControls objects, which in turn might be containers
+' themselves, and so on. It is another case of recursion in the object tree.
+
+' You can find an example of what you can do with these collections on the
+' free, Registered Level of The Development Exchange (see the Code Online box
+' at the end of the article for details).
+
+' You'll also find the complete source code of an add-in that helps you
+' quickly create a grid of controls.
+
+' TAP THE POWER OF EVENTS
+
+' You should know about one more item under VBE in the VB IDE object model:
+' the Events object. Don't let the fact that the name is plural fool you -
+' this is a class, not a collection. The only purpose of the class is to
+' expose its properties that also look like collections, but are not.
+
+' Using these properties - CommandBarEvents, FileControlsEvents,
+' ReferencesEvents, VBControlsEvents, SelectedVBControlsEvents,
+' VBComponentsEvents, VBProjectsEvents - you can obtain a reference to
+' another object that is capable of raising events in your add-in when
+' something happens in the VB environment.
+
+' For example, use the CommandBarEvents property if you want to be alerted
+' when the user clicks on a toolbar button or invokes a menu command:
+
+' Form level variable in Declarations section
+'Private WithEvents MenuHandler As CommandBarEvents
+
+Private Sub Form_Load()
+    Dim cbc As Office.CommandBarControl
+    Set cbc = VBInstance.CommandBars("Window").Controls("Split")
+    Set MenuHandler = VBInstance.Events.CommandBarEvents(cbc)
+End Sub
+
+' Because you declare MenuHandler using WithEvents, your add-in is able to
+' trap all the events it raises. For more information on the WithEvents
+' keyword, see my article, "Add Class Inheritance to Apps" [VBPJ June 1997].
+
+' CommandBarEvents objects expose only the Click event. Simply put your code
+' in the chain of actions that occur when the user selects the corresponding
+' command:
+
+Private Sub MenuHandler_Click(ByVal CommandBarControl As Object, Handled As Boolean, CancelDefault As Boolean)
+    ' Don't let the user split the window
+    CancelDefault = True
+End Sub
+
+' The VBControlsEvents property returns a reference that you can use to trap
+' all the events related to controls. Depending on the arguments you pass to
+' the property, you can monitor a specific form, all forms in a given project,
+' or any form in all the projects that are currently loaded in the environment:
+
+' Form-level variable in Declarations section
+'Private WithEvents CtrlHandler As VBControlsEvents
+
+Private Sub Init()
+    ' Use (Nothing, Nothing) to monitor all forms in all projects
+    Set CtrlHandler = VBInstance.Events.VBControlsEvents(Nothing, Nothing)
+End Sub
+
+' After you obtain a reference to a VBControlsEvents object, you can make
+' good use of its ItemAdded, ItemRemoved, and ItemRenamed events.
+
+' For example, suppose you are in charge of a programming team, and you want
+' to remind your co-workers to assign meaningful names to controls on forms.
+' Sure, you can rename controls when you revise the code, but this is a
+' nuisance and an error-prone process. A much better solution is to prompt
+' for a name when team members create the controls:
+
+Sub CtrlHandler_ItemAdded(ByVal VBControl As VBIDE.VBControl)
+    VBControl.Properties("Name") = InputBox("Please, type a " & _
+            "meaningful name *N*O*W* !")
+End Sub
+
+Sub CtrlHandler_ItemRenamed(ByVal VBControl As VBIDE.VBControl, ByVal OldName As String, ByVal OldIndex As Long)
+    'CtrlHandler_ItemRenamed
+End Sub
+
+Sub CtrlHandler_ItemRemoved(ByVal VBControl As VBIDE.VBControl)
+    'CtrlHandler_ItemRemoved
+End Sub
+
+' The SelectedVBControlsEvents property is similar to VBControlsEvents: it
+' lets you monitor when the user selects or deselects controls on a given form.
+
+' The object it returns exposes only two events, ItemAdded and ItemRemoved.
+' Use these events to set the enabled/disabled state of your own toolbar and
+' menu items.
+
+' You can also do interesting things with the FileControlsEvents property of
+' Events, such as monitor when a file is saved, renamed, added, or removed from
+' a project.
+
+' Although FileControlsEvents objects are most useful in full-fledged source
+' management and version-control utilities, you can still exploit them in other
+' creative ways.
+
+' For example, you can use FileControlsEvents objects to automatically compress
+' and back up all the files in the project as soon as they are saved to disk.
+
+' The VBComponentsEvents property returns an object that lets you keep track of
+' all the activity related to components: when they are saved, loaded, renamed,
+' and so on.
+
+' You can also receive an event when a component is selected, which is useful
+' if you want to disable buttons and menu items on your add-in.
+
+' The last property of the Events object, ReferencesEvents, returns an object
+' that raises an event whenever a reference is added or removed from a project.
+
+' START FROM THE TEMPLATE
+
+' After exploring the VB IDE object model, you'll find that many of the details
+' about the inner workings of add-ins are less obscure. However, setting up a
+' working add-in is still nontrivial.
+
+' Fortunately, VB includes a project template that saves you a lot of time while
+' building an add-in. Load it by issuing the New Project command under File, and
+' selecting the Addin template.
+
+' If you create add-ins using the provided template, ClassName is "Connect",
+' and ProjectName is "MyAddin". Of course, you should always change ProjectName
+' to something more descriptive. The actual name of the class doesn't really
+' matter, as long as it references the Microsoft Add-In Designer.
+
+' When the VB6 Add-in DLL is registered it adds your startup settings to the
+' registry automatically. The startup settings can be found in the object view
+' of the add-in Designer under the heading Initial Load Behavior. The startup
+' settings are also effected when you run the add-in project.
+
+' The add-in then loads automatically in the IDE the next time you start the
+' Visual Basic environment.
+
+' When the add-in has been properly registered, it appears in the Add-Ins dialog
+' box, along with a short description that you can modify only by acting on the
+' Description property of the Connect designer.
+
+' When the user runs the add-in, the VB IDE fires the AddinInstance_OnConnection
+' event in the Connect designer, passing a reference to itself. Within this method
+' the add-in initializes itself and typically adds one or more user interface items
+' to the IDE, such as menu items, new toolbars, or additional buttons on existing
+' toolbars.
+
+' Now that you know how to deal with the CommandBarEvents object, understanding
+' how the code in the template works should not be a problem.
+
+' Note that you should never store objects and values in global variables because
+' your add-in might be invoked from many instances of the IDE.
+
+' The other important event in the life of an add-in occurs when the VB IDE
+' calls the AddinInstance_OnDisconnection method. In this procedure, the
+' add-in must destroy all the objects it has created, such as menu items,
+' toolbar buttons, and event handlers.
+
+' After a call to this method, any previous reference to the VBE object - or
+' any of its dependent objects - becomes invalid and should not be used again
+' by the add-in.
+
+' Compile the add-in into an out-of-process EXE or an in-process DLL when you
+' complete the debug step. Generally, you should compile to EXEs only if your
+' add-in also works as a standalone utility; otherwise, use DLLs because they
+' interact much faster with the IDE when no cross-process communication is
+' involved.

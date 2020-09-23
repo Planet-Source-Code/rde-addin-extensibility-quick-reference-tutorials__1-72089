@@ -1,0 +1,28 @@
+
+Tutorial on how to test a VB Add-In
+
+1.) Open up the Add-In project in VB and Run it.
+
+2.) Open a new, Second Instance of VB and select a New or Existing project.
+    Check the Add-Ins Manager to make sure that the Add-In project is listed
+    and that the correct options are selected for that add-in
+    (e.g.. "Loaded", "Load on startup").
+
+As long as the Add-In Project is running in the First Instance,
+it should also appear on the Add-Ins menu in the Second Instance.
+
+The only drawback to this is that by Stopping the First Instance
+you may get a warning in the Second Instance that it is trying to
+use it (the First Instance).
+
+It will still let you stop and it might ask you if you want to
+remove it from the list of available add-ins, and the Menu item for
+the add-in may not be removed from the Menu.
+
+So, it's always a good idea to Unload the add-in you're testing with the
+Add-In Manager in the Second Instance, before completely stopping the Add-In
+project in the First Instance.
+
+You can set breakpoints and break, but before you Stop, always go back to
+Second Instance and unload it from the add-ins list (or close the test IDE)
+to avoid this little caveat when building and debugging add-ins.

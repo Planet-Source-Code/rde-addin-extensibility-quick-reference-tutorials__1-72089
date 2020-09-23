@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML><HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<title>Creating a reference with the Add-In designer</title>
+</HEAD><BODY>
+
+<h2>Creating a reference with the Add-In designer</h2>
+<p>
+You can create a reference to an add-in with the Add-In designer. To do this: 
+<ol start=4>
+<li>
+Create a new Add-In project (if you haven't done so already), <br><br></li>
+<li>
+Double-click the Add-In designer "Connect" in the Project window. This brings up the Add-In designer.<br><br></li>
+<li>
+In Display Name, enter the name of your add-in that will later appear in the Add-In Manager dialog box.<br><br></li>
+<li>
+In Add-In Description, enter a description of what the add-in does.<br><br></li>
+<li>
+In Application and Application Version, choose the host application and its version, in this case, Visual Basic version 6.0.<br><br></li>
+<li>
+In Initial Load Behavior, choose how your add-in loads:<ul type=disc>
+<li>
+<b>Command Line/Startup:</b> Add-in loads either when specifically invoked from a command-line parameter, or when Visual Basic starts.<br><br></li>
+<li>
+<b>Command Line:</b> Add-in loads only when specifically invoked from a command-line parameter.<br><br></li>
+<li>
+<b>Startup:</b> Add-in loads when you start Visual Basic.<br><br></li>
+<li>
+<b>None:</b> Add-in doesn't load when you start Visual Basic.</li>
+</ul>
+</li>
+<li>
+Check "Add-In is command-line safe (Does not put up any UI)" if you wish your add-in to run without displaying any dialog boxes boxes or forms—that is, run "behind the scenes" without any visible interface.<br><br></li>
+<li>
+Select the <b>Advanced</b> tab to enter additional information on localization resources, and registry settings, if applicable.</li>
+</ol>
+<p>
+Once the above information is filled out and you compile your project, your new add-in will appear in the Add-In Manager's list of available add-ins. Also, when the add-in ActiveX component is registered on a target system, your add-in will appear in the Add-In Manager's list of available add-ins.</p>
+
+</BODY></HTML>

@@ -1,0 +1,655 @@
+
+Addin Checklist
+
+    Public should be True.
+    Create the OnConnect and OnDisconnect procedures. 
+
+A few general suggestions about coding:
+
+    Add only one menu item under Add-Ins for each server. I add
+    additional items as submenu items.
+
+    If you use any databases, open the database for shared,
+    nonexclusive access. Remember that multiple clients use the
+    tables concurrently.
+
+    Do not put message boxes, modal forms, or lengthy processing in
+    the events fired by the VBIDE object. The OLE server will wait
+    past its time-out period only if a prompt return to the client
+    does not occur.
+
+    Use classes to connect forms to the VBIDE object. Send events
+    to the class instance that owns the form. (Forms may not
+    receive events.)
+
+    Avoid using As Object. I always declare items as their correct
+    data type for better readability and for better performance.
+
+    For example, I always declare the pointer to the VBIDE object as
+    a VBIDE.VBE. This data type is part of the "Microsoft Visual Basic
+    6.0 Extensibility" reference. The example below shows the difference:
+
+Private VBInstance As VBIDE.VBE 'Use
+Private VBInstance As Object 'AVOID
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Strategic Uses of Add–Ins
+
+In their simplest use, add–ins can automate development tasks in the same
+way macros automate spreadsheet tasks. Such automation may materialize in
+the form of wizards or through an interface designed to suit a specific
+audience.
+
+In more sophisticated implementations, add–ins can provide complete front
+ends, enabling developers to model systems in any number of ways. Such
+models can then be used to generate a Visual Basic project and supporting
+code. The following are a few of the possibilities:
+
+ Wizards. Wizards will provide easy-to-use wrappers for automating tasks,
+      from the simple and tedious to the sophisticated and complex.
+ Template Libraries. Add–ins will create and deliver libraries of Visual
+      Basic-based object templates that in turn can be added to any
+      Visual Basic project to accelerate development. Libraries also
+      will be used to provide complete application frameworks. The VB
+      AppFramework (AFW) add–in provides such capabilities. Through it,
+      developers can capture templates from existing objects and use
+      wizards to deliver them to other projects.
+ Style Libraries. Add–ins will help developers create style libraries in
+      much the same way they help them create object templates. Styles
+      are collections of object properties, which can be captured from
+      existing objects and applied repeatedly to other objects.
+      AFW provides these capabilities as well.
+ Paperless Standards. Libraries of objects and styles will help to create
+      paperless standards. Up to now, printed guidelines have been used
+      to defined the appearance of a form or the way code is commented.
+      With add–ins, developers will retrieve such information from
+      libraries and add it to their projects, helping to ensure the
+      consistent and rapid use of the standards.
+ Form Generators. These add–ins will create forms from scratch or
+      accelerate the process of laying out controls on forms. They'll also
+      automatically add custom form templates and controls to projects.
+ CASE Tools. These tools will enable the graphical modeling of business
+      processes and then will automatically generate code and interfaces.
+      Such tools may present a building-block approach, an outline
+      approach, or any other approach that can be tailored to a
+      specific audience.
+ Data Modeling Tools. Similar to the CASE tools, this group of add–ins will
+      address a database-specific set of problems. Project frameworks
+      will be generated automatically after modeling them in high-level
+      interfaces provided by the add–in.
+ Source Code Control. An add–in can be constructed to be informed of changes
+      to a Visual Basic project, such as an addition, a save, or a removal
+      of files. Using such capabilities, source code control systems can
+      provide a much tighter level of integration than was possible before.
+      Microsoft Visual SourceSafe™ will be provided as an add–in to Visual
+      Basic.
+ Expert Systems. This group of add–ins will provide expert interfaces to
+      Visual Basic projects. They might help developers audit projects by
+      seeking ways to optimize resource usage, enforce code and interface
+      standards, or examine code for preferred algorithms.
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+A command bar unifies the concept of menus and toolbars into a single
+common visual and programmatic object.
+
+As command bars, menus contain menu commands which can have icons and
+captions and exhibit button-like behavior while remaining in the familiar
+menu format.
+
+Some toolbar buttons have dropdown arrows, similar to ComboBox controls.
+
+A command bar object can contain other command bar objects, depending on
+its type.
+
+There are three types of command bars:
+
+Popup    - A Popup command bar is equivalent to a menu item on a menu bar.
+ComboBox - A ComboBox command bar is similar to a ComboBox control. That
+           is, a toolbar button with a dropdown arrow next to it (like the
+           Add Project toolbar button). When you click the arrow, it
+           displays more menu commands with icons.
+Button   - A Button command bar is equivalent to a standard toolbar button.
+           That is, a button with an icon displayed on it.
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+' VB5 Class module may look something like the following: 
+
+  Option Explicit
+
+  Private ThisInstance As VBIDE.Application
+  Private AddInMenuLine As VBIDE.MenuLine
+  Private hMenuLine As Long
+
+  Public Sub ConnectAddIn(VBInstance As Object)
+     Set ThisInstance = VBInstance
+     Set AddInMenuLine = ThisInstance.AddInMenu.MenuItems.Add("Basic Add-In")
+
+     hMenuLine = AddInMenuLine.ConnectEvents(Me)
+  End Sub
+
+  Public Sub DisconnectAddIn(Mode As Integer)
+     AddInMenuLine.DisconnectEvents hMenuLine
+     ThisInstance.AddInMenu.MenuItems.Remove AddInMenuLine
+  End Sub
+
+  Public Sub AfterClick()
+     MsgBox "Basic Add-In Example"
+  End Sub
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Option Explicit
+
+'IMPORTANT: Instancing must be Multiuse
+'REFERENCES: Microsoft Visual Basic 6.0 Extensibility
+Private VBInst As VBIDE.Application 'One PER VBIDE!
+
+Private Type AddinMenu
+    sMenuItem As String
+    hMenuItem As Long
+    oMenuItem As VBIDE.MenuLine
+End Type
+
+Private MenuItems() As AddinMenu
+
+Private Sub Initialize()
+    'Initialize is NEVER called in an Addin
+End Sub
+
+Public Sub ConnectAddIn(VBInstance As Object)
+    Set VBInst = VBInstance
+    'Menu Items
+    AddMenu
+    ShowProjectFiles frmAddInMgr.FileList
+    frmAddInMgr.Visible = True
+End Sub
+
+Public Sub DisconnectAddIn(Mode As Integer)
+    Dim i%
+    For i% = LBound(MenuItems) To UBound(MenuItems)
+        With MenuItems(i%)
+            If .hMenuItem <> 0 Then 'ROBUSTNESS CODE
+                .oMenuItem.DisconnectEvents .hMenuItem
+            End If
+            VBInst.AddinMenu.MenuItems.Remove .oMenuItem
+        End With
+    Next i%
+    Unload frmAddInMgr
+End Sub
+
+Private Sub AddMenu()
+    Const MenuItem_Count = 2 'CHANGE ME
+    ReDim MenuItems(1 To MenuItem_Count)
+    Dim i%
+
+    MenuItems(1).sMenuItem = "Addin AA"
+    MenuItems(2).sMenuItem = "Addin B"
+    For i% = LBound(MenuItems) To UBound(MenuItems)
+        With MenuItems(i%)
+            If Len(.sMenuItem) > 0 Then
+                Set .oMenuItem = VBInst.AddinMenu.MenuItems.Add(.sMenuItem)
+                'WARNING: with '.oMenuItem.ConnectEvents Me' menu item CANNOT be Removed.
+                .hMenuItem = .oMenuItem.ConnectEvents(Me)
+            End If
+        End With
+    Next i%
+End Sub
+
+Public Sub AfterClick()
+    ShowProjectFiles frmAddInMgr.FileList
+End Sub
+
+Private Sub ShowProjectFiles(ctlListBox As Control)
+    Dim i%
+    Dim Prj As ProjectTemplate, Cmp As Component
+    Set Prj = VBInst.ActiveProject
+    ctlListBox.Clear
+    For i% = 0 To Prj.Components.Count - 1
+        ctlListBox.AddItem Prj.Components(i%).Name
+        Set Cmp = Prj.Components(i%)
+        Debug.Print Cmp.Name
+    Next i%
+End Sub
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+' Generated by the VB6 addin wizard
+
+' Project references:
+'     Microsoft Office 8.0 Object Library
+'     Microsoft Visual Basic 6.0 Extensibility
+'     Microsoft Add-In Designer
+
+'''''''''''''''''''''''''''''''''''''
+' In standard module
+
+Function AddToAddInCommandBar(VBInst As Object, sCaption As String, oBitmap As Object) As Object   'Office.CommandBarControl
+    On Error GoTo AddToAddInCommandBarErr
+    
+    Dim c As Integer
+    Dim cbMenuCommandBar As Object 'Office.CommandBarControl 'command bar object
+    Dim cbMenu As Object
+
+    'see if we can find the Add-Ins menu
+    Set cbMenu = VBInst.CommandBars("Add-Ins")
+    If cbMenu Is Nothing Then
+        'not available so we fail
+        Exit Function
+    End If
+    
+    'add it to the command bar
+    Set cbMenuCommandBar = cbMenu.Controls.Add(1)
+    c = cbMenu.Controls.Count - 1
+    If cbMenu.Controls(c).BeginGroup And _
+        Not cbMenu.Controls(c - 1).BeginGroup Then
+        'this s the first addin being added so it needs a separator
+        cbMenuCommandBar.BeginGroup = True
+    End If
+    'set the caption
+    cbMenuCommandBar.Caption = sCaption
+    'undone:set the onaction (required at this point)
+    cbMenuCommandBar.OnAction = "hello"
+    'copy the icon to the clipboard
+    Clipboard.SetData oBitmap
+    'set the icon for the button
+    cbMenuCommandBar.PasteFace
+  
+    Set AddToAddInCommandBar = cbMenuCommandBar
+    
+    Exit Function
+AddToAddInCommandBarErr:
+  
+End Function
+
+''''''''''''''''''''''''''''
+' In Designer
+
+Option Explicit
+
+Dim mcbMenuCommandBar         As Office.CommandBarControl  'command bar object
+Public WithEvents MenuHandler As CommandBarEvents          'command bar event handler
+Dim mfrmWizard As frmWizard
+Dim VBInstance As VBIDE.VBE
+
+'------------------------------------------------------
+'this method adds the Add-In to the VB menu
+'it is called by the VB addin manager
+'------------------------------------------------------
+Private Sub AddinInstance_OnConnection(ByVal Application As Object, ByVal ConnectMode As AddInDesignerObjects.ext_ConnectMode, ByVal AddInInst As Object, custom() As Variant)
+   On Error GoTo error_handler
+   
+   Set VBInstance = Application
+   
+   If ConnectMode = ext_cm_External Then
+       'Used by the wizard toolbar to start this wizard
+       LoadMe
+   Else
+       Set mcbMenuCommandBar = AddToAddInCommandBar(VBInstance, LoadResString(15), LoadResPicture(5000, 0))
+       'sink the event
+       Set Me.MenuHandler = VBInstance.Events.CommandBarEvents(mcbMenuCommandBar)
+   End If
+  
+   Exit Sub
+     
+error_handler:
+   MsgBox Err.Description
+End Sub
+
+'------------------------------------------------------
+'this method removes the Add-In from the VB menu
+'it is called by the VB addin manager
+'------------------------------------------------------
+Private Sub AddinInstance_OnDisconnection(ByVal RemoveMode As AddInDesignerObjects.ext_DisconnectMode, custom() As Variant)
+    'delete the command bar entry
+    mcbMenuCommandBar.Delete
+End Sub
+
+'this event fires when the menu is clicked in the IDE
+Private Sub MenuHandler_Click(ByVal CommandBarControl As Object, handled As Boolean, CancelDefault As Boolean)
+    LoadMe
+End Sub
+
+Private Sub LoadMe()
+    Set mfrmWizard = New frmWizard
+    'pass the vb instance to the wizard module
+    Set mfrmWizard.VBInst = VBInstance
+    'load and show the form
+    mfrmWizard.Show vbModal
+    Set mfrmWizard = Nothing
+End Sub
+
+''''''''''''''''''''''''''''''''
+' In frmWizard Form (Add-in GUI)
+
+Private VBInst       As VBIDE.VBE
+
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+' Add a menu command to the Tools menu.
+Set cbcMenuCommandBar = VBInstance.CommandBars("Tools").Controls.Add(before:=3)
+
+ '=========================================================
+
+Function AddToAddInCommandBar(sCaption As String) As Office.CommandBarControl
+    On Error GoTo AddToAddInCommandBarErr
+    Dim cbMenuCommandBar As Office.CommandBarControl 'command bar object
+    Dim cbMenu As Object
+
+    'see if we can find the Add-Ins menu
+    Set cbMenu = VBInstance.CommandBars("Add-Ins")
+    'if not available we fail
+    If cbMenu Is Nothing Then Exit Function
+
+    'add it to the command bar
+    Set cbMenuCommandBar = cbMenu.Controls.Add(1)
+    'set the caption
+    cbMenuCommandBar.Caption = sCaption
+
+    Set AddToAddInCommandBar = cbMenuCommandBar
+AddToAddInCommandBarErr:
+End Function
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+' This is the Designer module that contains the four methods
+' that are needed for the Add-In’s interface to VB.
+
+' Project references:
+'     Microsoft Office 8.0 Object Library
+'     Microsoft Add-In Designer
+'     Microsoft Visual Basic 6.0 Extensibility
+
+' The add-in must save a reference to the particular instance of the VB environment
+' that has just installed into the VBInstance class property. Note that you can't use
+' a global variable because the same add-in may serve multiple VB instances.
+' You need this object to access all the items in the VB IDE hierarchy.
+
+' Note that you should never store objects and values in global variables because your
+' add-in might be invoked from many instances of the IDE. You should use this approach
+' because there is a distinct class object for each instance of the environment that
+' uses the add-in:
+
+'public in form or class only:
+  ' Application reference - do not store in the Connect designer
+  Public oVBE As VBIDE.VBE
+  Public gAddInInst As Object ' AddIn instance
+
+  ' Get a connection to the main VBE
+  Set frm.oVBE = Application
+  ' Keep a copy of the application instance
+  Set frm.gAddInInst = AddInInst
+
+
+' VB lets you dock and group its windows together, and a window is linked to other
+' windows that share the same frame. If the window is not docked, its LinkedWindowFrame
+' property returns Nothing. Otherwise, you can enumerate the frame's LinkedWindows
+' collection to access all the companion windows in the same frame. The members of this
+' collection are other Window objects, so you are actually exploring a recursive tree.
+
+' Note that you cannot dock code and designer windows, the Object Browser, or the Search and
+' Replace dialogs. Use the Type property to learn which kind of window you're dealing with.
+
+'Dim cp As VBIDE.CodePane
+'For Each cp In VBInstance.CodePanes
+'    List1.AddItem cp.Window.Caption
+'Next
+
+'' list all the controls on the selected form (or usercontrol etc)
+'With VBInstance
+'  With .SelectedVBComponent
+'    ' Determine the Type of Designer object
+'    If .Type = vbext_ct_VBForm Then 'And .HasOpenDesigner
+'      Dim frm As VBIDE.VBForm
+'      Dim ctr As VBIDE.VBControl
+'      Set frm = .Designer
+'      For Each ctr In frm.VBControls
+'        List1.AddItem ctr.ClassName & " " & ctr.Properties("Name")
+'      Next
+'    End If
+'  End With
+'End With
+
+
+' VBComponents objects can store their contents in one single file, as in the case of standard
+' and class modules, or in two distinct files. For example, forms use both FRM and FRX files.
+' You can detect the number of files used with the FileCount property, and learn their path using
+' the FileNames property. You can query whether the component has been modified (property IsDirty),
+' and you can even save it to disk (method SaveAs). If the component corresponds to a visible object,
+' you can read and modify its settings using the Properties collection:
+
+' set the BackColor of the current selected component
+'VBInstance.SelectedVBComponent.Properties("BackColor") = vbGray
+
+
+
+
+Private VBInstance As VBIDE.VBE
+Private AddinInstance As VBIDE.AddIn
+
+Private cbcMenu As Office.CommandBarControl
+Private WithEvents cbeMenu As CommandBarEvents
+
+Private cbButtons As CommandBar
+Private cbbButton As CommandBarButton
+Private WithEvents cbeButton As CommandBarEvents
+
+Private cbpContext As CommandBarPopup
+
+Private cbpMenu As CommandBarPopup
+Private cbcItem As CommandBarControl
+Private WithEvents cbeItem As CommandBarEvents
+
+AddinInstance_OnConnection(ByVal Application As Object, ByVal ConnectMode As AddInDesignerObjects.ext_ConnectMode, ByVal AddInInst As Object, custom() As Variant)
+    Set VBInstance = Application
+      'save the addin instance
+      Set AddinInstance = AddInInst
+
+'VBInstance.FullName
+'VBInstance.ActiveWindow.Type 'As VBIDE.vbext_WindowType
+
+    If ConnectMode = ext_cm_External Then
+        'Used by the wizard toolbar to start this
+        ExecProcOrDisplayForm
+    Else
+        Set cbcMenu = AddToAddInCommandBar("AddIn Name")
+        Set cbeMenu = VBInstance.Events.CommandBarEvents(cbcMenu)
+    End If
+
+'    If ConnectMode = ext_cm_AfterStartup Then
+'        If GetSetting(App.Title, "Settings", "DisplayOnConnect", "0") = "1" Then
+'            'set this to display the form on connect
+'            Me.Show
+'        End If
+'    End If
+
+    'set the VB IDE as the parent to keep the addin on top
+    mhWndPrev = SetParent(frmAddIn.hWnd, VBInstance.MainWindow.hWnd)
+
+    Set cbButtons = VBInstance.CommandBars.Add("Buttons", msoBarFloating, , True)
+    cbButtons.Visible = True
+    Set cbbButton = cbButtons.Controls.Add(msoControlButton)
+
+
+
+    With cbbButton
+        .Caption = "Caption"
+        .ToolTipText = "Tool Tip Text"
+        .Style = msoButtonIcon
+        '        msoButtonCaption
+        '        msoButtonIconAndCaption
+        'the face id is a built in graphic for the button - there are thousands
+        '  http://www.outlookexchange.com/articles/toddwalker/BuiltInOLKIcons.asp
+        .FaceId = 3078
+    End With
+    Set cbeButton = VBInstance.Events.CommandBarEvents(cbbButton)
+
+    Set cbpMenu = VBInstance.CommandBars("Menu Bar").Controls.Add(Type:=msoControlPopup, Before:=6)
+    cbpMenu.Caption = "&NewMenu"
+
+'      'Add item to Code Editor Window PopUp Menu
+'      Set cbpContext = VBInstance.CommandBars("Code Window").Controls.Add _
+                       (msoControlPopup, , , 1) '1=Before First
+'      cbpContext.Caption = "Insert Code"
+
+    Set cbcItem = cbpMenu.CommandBar.Controls.Add(msoControlButton, 487)
+    With cbcItem
+       .Caption = "Item caption"
+       .ToolTipText = "Tooltip for item"
+    End With
+    Set cbeItem = VBInstance.Events.CommandBarEvents(cbcItem)
+
+
+
+AddinInstance_OnDisconnection(ByVal RemoveMode As AddInDesignerObjects.ext_DisconnectMode, custom() As Variant)
+    cbcMenu.Delete
+    Set cbcMenu = Nothing
+    Set cbeMenu = Nothing
+
+    cbbButton.Delete
+    Set cbbButton = Nothing
+    Set cbeButton = Nothing
+
+    cbcItem.Delete
+    Set cbcItem = Nothing
+    Set cbeItem = Nothing
+
+    cbpMenu.Delete
+    Set cbpMenu = Nothing
+
+    'shut down the Add-In
+    If FormDisplayed Then
+        SaveSetting App.Title, "Settings", "DisplayOnConnect", "1"
+        FormDisplayed = False
+    Else
+        SaveSetting App.Title, "Settings", "DisplayOnConnect", "0"
+    End If
+
+    SetParent frmAddIn.hWnd, mhWndPrev
+    Unload frmAddIn
+    Set VBInstance = Nothing
+
+    ' Cleanup memory (not automatic)
+    DestroySpellToolWindow
+
+End Sub
+
+
+'Private Sub IDTExtensibility_OnStartupComplete(custom() As Variant)
+'    If GetSetting(App.Title, "Settings", "DisplayOnConnect", "0") = "1" Then
+'        'set this to display the form on connect
+'        Me.Show
+'    End If
+'End Sub
+
+Private Sub AddinInstance_OnStartupComplete(Custom() As Variant)
+    If GetSetting(App.Title, "Settings", "DisplayOnConnect", "0") = "1" Then
+        'set this to display the form on connect
+        Me.Show
+    End If
+End Sub
+
+Private Sub AddinInstance_OnAddInsUpdate(Custom() As Variant)
+    'AddinInstance_OnAddInsUpdate
+End Sub
+
+Private Sub AddinInstance_OnBeginShutdown(Custom() As Variant)
+    'AddinInstance_OnBeginShutdown
+End Sub
+
+Private Sub AddinInstance_Initialize()
+    'AddinInstance_Initialize
+End Sub
+
+Private Sub AddinInstance_Terminate()
+    'AddinInstance_Terminate
+End Sub
+
+
+
+
+cbeMenu_Click(ByVal CommandBarControl As Object, handled As Boolean, CancelDefault As Boolean)
+    ExecProcOrDisplayForm
+
+cbeButton_Click(...
+cbeItem_Click(...
+
+
+AddToAddInCommandBar(sCaption As String) As CommandBarControl
+    Dim cbMenuBar As CommandBarControl
+    Set cbMenuBar = VBInstance.CommandBars("Add-Ins").Controls.Add(msoControlButton)
+    'cbMenuBar.BeginGroup = True
+'                c = .Controls.Count - 1
+'                If .Controls(c).BeginGroup And Not .Controls(c - 1).BeginGroup Then
+'                    'menu separator required
+'                    MenuItem.BeginGroup = True
+'                End If
+    cbMenuBar.Caption = sCaption
+    Set AddToAddInCommandBar = cbMenuBar
+End Function
+
+'Set cbcSpell = cbEdit.Controls.Add(msoControlButton, , , cbEdit.Controls.Count + 1)
+
+'            With Clipboard
+'                ClipboardText = .GetText
+'                'set menu picture
+'                .SetData fSplash.picMenu.Image
+'                MenuItem.PasteFace
+'                .Clear
+'                .SetText ClipboardText
+'            End With
+
+
+'Set oMenuCommandBar = AddToCommandBar("Add-Ins", "Addin caption")
+Private Function AddToCommandBar(VBMenu As String, Caption As String, Optional Bitmap As StdPicture) As CommandBarControl
+    On Error GoTo AddToCommandBarErr
+    Dim cbMenu As CommandBarControl 'command bar object
+    Dim oTemp As Object, sTemp As String
+
+    'add it to the specified command bar
+    Set cbMenu = VBInstance.CommandBars(VBMenu).Controls.Add(Type:=msoControlButton)
+
+    'set the caption
+    cbMenu.Caption = Caption
+
+    If Not Bitmap Is Nothing Then
+        With Clipboard
+            sTemp = .GetText
+            Set oTemp = .GetData
+            'copy the icon to the clipboard
+            .SetData Bitmap, vbCFBitmap
+            'set the icon for the button
+            cbMenu.PasteFace
+            .Clear
+            .SetData oTemp
+            .SetText sTemp 
+        End With
+    End If
+
+    Set AddToCommandBar = cbMenu
+    Set cbMenu = Nothing
+AddToCommandBarErr:
+End Function
+
+
+
+'iNumber = ThisWorkBook.Worksheets("Sheet1").Range("A1").Value
+'Assume the CodeName property of the worksheet is wksMySheet
+'iNumber = wksMySheet.Range("A1").Value
+
+'iNumber = vbaProj.Worksheets("Sheet1").Range("A1").Value
+'iNumber = vbaProj.Sheet1.Range("A1").Value

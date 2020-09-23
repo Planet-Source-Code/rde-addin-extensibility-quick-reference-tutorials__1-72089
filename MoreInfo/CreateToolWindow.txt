@@ -1,0 +1,175 @@
+
+CreateToolWindow Method
+
+Creates a new tool window containing the indicated ActiveX document.
+
+Function CreateToolWindow(AddInInst As AddIn, ProgId As String, _
+                          Caption As String, GuidPosition As String, _
+                          DocObj As Object) As VBIDE.Window
+
+AddInInst    - add-in whose lifetime determines that of the new tool window. 
+ProgId       - Programmatic string ID of the ActiveX document object. 
+Caption      - Caption for the new tool window. 
+GuidPosition - Unique string identifier for the new window. 
+DocObj       - ActiveX document object, hosted in the new tool window. 
+
+'===============================================================
+
+' CreateToolWindow
+
+' Add the following declarations for the CreateToolWindow function
+Private mWin As Window
+Private mobjDoc As axdUserDoc
+Const guidMyTool$ = "Unique-string-Use-guidgen.exe"
+
+Private Sub AddinInstance_OnConnection(ByVal VBInst As Object, _
+                    ByVal ConnectMode As VBIDE.vbext_ConnectMode, _
+                    ByVal AddInInst As VBIDE.AddIn, custom() As Variant)
+    Set mWin = AddInInst.VBE.Windows.CreateToolWindow(AddInInst, _
+               "MyAddin.axdUserDoc", "ActiveX Caption", guidMyTool, mobjDoc)
+    mWin.Visible = True
+End Sub
+
+'===============================================================
+
+Create a docable window addin for the visual basic ide
+
+First of all, you have to use an ActiveX Document (userdocument)
+rather than a form. To do this create a form as you want it to be
+select new UserDox then in the popup ActiveX Document. You will be
+prompted for a form to convert do this and remove the original.
+
+''''''''''''''''''''''''''''''''''''''''''
+'for the toolbox window
+Private objWindow as VBInstance.Window
+
+'Then, I declared globally (yes, I know, that's bad):
+Public g_objDoc as Object 'set the ActiveX document
+
+'Next, obtain a registry format GUID. You can use Guidgen.exe for this.
+'Then declare a constant in the connect class that holds the GUID.
+
+Const strGUID As String = "{4232321C-4232-4232-4232-4232321C4232}"
+
+'Then, in the OnConnection procedure:
+
+Dim objActiveWindow As Window
+Set objActiveWindow = VBInstance.ActiveWindow
+
+'in the following call ProgramName.ActiveXDoc is the ProgID for the userdoc
+Set objWindow = VBInstance.Windows.CreateToolWindow( AddInInst, _
+                             "ProgramName.ActiveXDoc", "Caption", strGUID, g_objDoc)
+objWindow.Visible = True
+
+'set focus back to main window
+If Not objActiveWindow Is Nothing Then objActiveWindow.SetFocus
+''''''''''''''''''''''''''''''''''''''
+
+Remember to set both objects (objWindow and g_objMain) to nothing
+on the OnDisconnection method.
+
+I downloaded this from the net. Its how i learned to do this.
+
+Hope that helps!  Jeff
+
+'===============================================================
+
+  Dim aiTmp As AddIn
+  
+  'save the vb instance
+  Set VBInstance = Application
+
+  If Not gwinWindow Is Nothing Then
+    'already running so just show it
+    Show
+    If ConnectMode = ext_cm_AfterStartup Then
+      'started from the addin manager
+      AddToCommandBar
+    End If
+    Exit Sub
+  End If
+
+  'create the tool window
+  If ConnectMode = ext_cm_External Then
+    'need to see if it is already running
+    On Error Resume Next
+    Set aiTmp = VBInstance.Addins("TabOrder.Connect")
+    On Error GoTo AddinInstance_OnConnectionErr
+    If aiTmp Is Nothing Then
+      'app is not in the VBADDIN.INI file so it is not in the collection
+      'so lets attempt to use the 1st addin in the collection just
+      'to get this app running and if there are none, an error
+      'will occur and this app will not run
+       Set gwinWindow = VBInstance.Windows.CreateToolWindow(VBInstance.Addins(1), "TabOrder.docTabOrder", LoadResString(10), guidMYTOOL$, gdocTabOrder)
+    Else
+      If aiTmp.Connect = False Then
+        Set gwinWindow = VBInstance.Windows.CreateToolWindow(aiTmp, "TabOrder.docTabOrder", LoadResString(10), guidMYTOOL$, gdocTabOrder)
+      End If
+    End If
+  Else
+    'must've been called from addin mgr
+    Set gwinWindow = VBInstance.Windows.CreateToolWindow(AddInInst, "TabOrder.docTabOrder", LoadResString(10), guidMYTOOL$, gdocTabOrder)
+  End If
+
+  'sink the project, components and controls event handler
+  Set Me.PrjHandler = VBInstance.Events.VBProjectsEvents
+  Set Me.CmpHandler = VBInstance.Events.VBComponentsEvents(Nothing)
+  Set Me.CtlHandler = VBInstance.Events.VBControlsEvents(Nothing, Nothing)
+
+  If ConnectMode = vbext_cm_External Then
+    'started from the addin toolbar
+    Show
+  ElseIf ConnectMode = vbext_cm_AfterStartup Then
+    'started from the addin manager
+    AddToCommandBar
+  End If
+
+'===============================================================
+
+' Tip: Never use the same GUID for a different window.
+
+Public Sub CreateSpellToolWindow()
+    
+    On Error GoTo Proc_Err
+    Dim winActive As Window
+    
+    ' Save the active window
+    Set winActive = oVBE.ActiveWindow
+    ' Create a ToolWindow
+    Set gSpellWindow = oVBE.Windows.CreateToolWindow(gAddInInst, _
+        "SpellCheckVb.docSpell", sAddinCaption, sGUIDSpell, aiSpellDoc)
+    ' Make sure its invisible
+    gSpellWindow.Visible = False
+
+    ' Return focus
+    If Not winActive Is Nothing Then winActive.SetFocus
+    
+Proc_Exit:
+    Exit Sub
+
+Proc_Err:
+    utlErrorHandler "CreateSpellToolWindow"
+    Resume Proc_Exit
+End Sub
+
+Public Sub DestroySpellToolWindow()
+    On Error GoTo Proc_Err
+    ' Remove our new toolwindow
+    gSpellWindow.Visible = False
+    Set aiSpellDoc = Nothing
+    Set gSpellWindow = Nothing
+Proc_Exit:
+    Exit Sub
+Proc_Err:
+    utlErrorHandler "DestroySpellToolWindow"
+    Resume Proc_Exit
+End Sub
+
+'===============================================================
+
+
+
+
+
+
+

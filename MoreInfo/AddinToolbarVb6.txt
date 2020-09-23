@@ -1,0 +1,75 @@
+
+' Make sure that “Microsoft Office 8.0 Object Library” is selected in the
+' References dialog box, allowing access to the Office command bar objects.
+
+' Project references:
+'     Microsoft Office 8.0 Object Library
+'     Microsoft Visual Basic 6.0 Extensibility
+'     Microsoft Add-In Designer
+
+Private VBInst As VBIDE.VBE
+' VBInst is assigned a pointer to the current IDE's VBA object which is
+' passed as a parameter to the OnConnection procedure. It's retained because
+' you need it later for disconnecting the add-in. Other procedures may have
+' a need for it as well.
+
+Private mcbMenuCommandBarCtrl As Office.CommandBarControl
+' This will be set to the new command bar control.
+
+Private WithEvents MenuHandler As CommandBarEvents
+' This is the event handling procedure for
+' the click event of the new command bar control.
+
+Private Sub AddinInstance_OnConnection(ByVal VBInstance As Object, _
+                        ByVal ConnectMode As VBIDE.vbext_ConnectMode, _
+                        ByVal AddInInst As VBIDE.AddIn, custom() As Variant)
+ 
+    ' Save the current instance of Visual Basic.
+    Set VBInst = VBInstance
+
+    ' Add a menu command to the Tools menu.
+    Set mcbMenuCommandBarCtrl = VBInst.CommandBars("Tools").Controls.Add(before:=3)
+
+    ' Place a separator bar before the new menu command.
+    mcbMenuCommandBarCtrl.BeginGroup = True
+
+    ' Set the title for the add-in.
+    mcbMenuCommandBarCtrl.Caption = "My New Add-In"
+
+    ' Copy an icon bitmap to the clipboard.
+    Clipboard.SetData LoadPicture("c:\windows\triangles.bmp")
+
+    ' Copy the icon from the clipboard to the menu command's icon.
+    mcbMenuCommandBarCtrl.PasteFace
+
+    ' Connect the event handler to receive the events for the new
+    ' command bar control.
+    Set MenuHandler = VBInst.Events.CommandBarEvents(mcbMenuCommandBarCtrl)
+
+    ' Place a separator bar after the new menu command.
+    VBInst.CommandBars("Tools").Controls(4).BeginGroup = True
+End Sub
+
+Private Sub AddinInstance_OnDisconnection(ByVal VBInstance As Object, _
+                ByVal UnLoadMode As Long, ByVal AddInInst As VBIDE.AddIn, _
+                custom() As Variant)
+    ' Delete the new menu command from the Tools menu.
+    mcbMenuCommandBarCtrl.Delete
+End Sub
+
+Private Sub MenuHandler_Click(ByVal CommandBarControl As Object, _
+                Handled As Boolean, CancelDefault As Boolean)
+    MsgBox "You clicked the new menu command."
+End Sub
+
+' Save and then compile the Add-in project (as an ActiveX component).
+
+' Start a new project and activate the add-in through the Add-In Manager.
+
+' Look in the Tools menu. Notice that there is now a My New Add-In menu command.
+
+' Click the new menu command. You should get a message box confirming that
+' you clicked the menu command.
+
+' Disconnect the add-in in the Add-In Manager. Notice that the menu command
+' is removed from the Tools menu.
