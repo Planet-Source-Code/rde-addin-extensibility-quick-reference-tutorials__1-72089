@@ -1,0 +1,72 @@
+
+' The Add-In toolbar object model has an object known as
+' the Manager object. It contains two methods:
+
+'AddToAddInToolbar
+'RemoveAddInFromToolbar
+
+' These methods allow you to programmatically place and
+' remove buttons to and from the Add-In toolbar.
+
+' This code is an example of how to programmatically add
+' an add-in to the Add-In toolbar and ensure that the
+' Add-In toolbar is automatically loaded the next time
+' Visual Basic is started:
+
+'Set Object = CreateObject("AddInToolbar.Manager")
+'Object.AddToAddInToolbar (sFileName As String, _
+'                          sProgID As String, _
+'                          sAddInName As String, _
+'                          ShowOnToolbar As Boolean, _
+'                          ForceAddInToolbar As Boolean)
+'
+' Object - An Object expression that evaluates to an object in the
+'          Applies To list.
+' sFileName - Required. A string expression specifying the path to the
+'             add-in or Wizard and the name of its .Exe or .Dll file.
+' sProgID - Required. A string expression specifying the programmatic
+'           ID (ProgID) of the add-in or Wizard.
+' sAddInName - Required. A string expression specifying the title of
+'              the add-in or Wizard.
+' ShowOnToolbar - Required. A Boolean expression specifying whether the
+'               add-in or Wizard referred to will appear on the Add-In
+'               toolbar. True = yes, False = no.
+' ForceAddInToolbar - Required. A Boolean expression specifying whether
+'               the Add-In toolbar is automatically displayed the next
+'               time Visual Basic is started. True = yes, False = no.
+
+Sub AddToToolbar()
+    Dim x as Object
+    Set x=CreateObject("AddInToolbar.Manager")
+
+    x.AddToAddInToolbar sFileName:="C:\VB\MyAdd.DLL", _
+                        sProgID:="MyAddIn.Connect", _
+                        sAddInName:="MyAddIn Title", _
+                        ShowOnToolbar:=True, _
+                        ForceAddInToolbar:=True
+End Sub
+
+' This code is an example of how to remove an add-ins
+' button from the Add-In toolbar:
+
+'Object.RemoveAddInFromToolbar (sAddInName As String)
+'
+' Object - An object expression that evaluates to an object
+'          in the Applies To list. 
+' sAddInName - Required. A string expression specifying the name
+'              of the add-in or Wizard to remove from the Add-In
+'              toolbar (as specified by the sAddInName parameter
+'              from the AddToAddInToolbar method).
+
+Sub RemoveFromToolbar()
+    Dim x As Object
+    Set x = CreateObject("AddInToolbar.Manager")
+
+    x.RemoveAddInFromToolbar sAddInName:="MyAddIn Title"
+End Sub
+
+' The registry location for the Add-In toolbar is:
+
+HKEY_CURRENT_USER\Software\Microsoft\VBA\Microsoft Visual Basic\AddInToolbar
+HKEY_CURRENT_USER\Software\Microsoft\Visual Basic\6.0\AddInToolbar
+

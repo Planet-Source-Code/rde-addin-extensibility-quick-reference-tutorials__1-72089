@@ -1,0 +1,1114 @@
+<html><head>
+   <style type="text/css">
+   <!--
+     span.keyword    {font-family: "Courier New", monospace; color: #000099;}
+     span.comment    {font-family: "Courier New", monospace; color: #009900;}
+     span.identifier {font-family: "Courier New", monospace; color: #660000;}
+     span.event      {font-family: "Courier New", monospace; color: #cc6600;}
+     span.text       {font-family: "Courier New", monospace; color: #000033;}
+   -->
+   </style>
+</head><body>
+
+<h2>Working with the Design Time Environment object</h2>
+
+<pre><span class="text"> The DTE object is the root object from which all other objects
+ and collections in environment extensibility are accessed.
+
+ Add-ins get the DTE object when the environment connects to the
+ add-in in the OnConnection method.
+
+ There is no other way to access the DTE object. If fact, as the
+ DTE object is hidden, it is exposed to the VB add-in developer as
+ the Visual Basic Extensibility object, and is referenced through
+ the Visual Basic Integrated Development Environment object.
+
+ The VBE object contains all extensibility objects and collections
+ represented in Visual Basic for Applications, which in turn have
+ properties, methods, and events which expose its functionality.
+
+ To use the Visual Basic Extensibility object, your add-in project
+ must reference the Microsoft Visual Basic 6.0 Extensibility library.
+ You must also reference the Microsoft Add-In Designer as well as
+ the Microsoft Office 8.0 Object Library.
+
+ Quick Reference:
+
+ Use the <a href="#wins">Windows</a> collection to access the collection of windows.
+  Includes Count, Parent, Item, CreateToolWindow, etc. A <a href="#win">Window</a>
+   includes Caption, Move, Type, WindowState, Close, SetFocus, etc.
+
+ Use the <a href="#ads">Addins</a> collection to access the collection of add-ins.
+  Includes Count, Parent, Item, Update. <a href="#conm">ConnectMode</a> and RemoveMode.
+   An <a href="#adin">Addin</a> includes Connected, Description, Guid, ProgId, etc.
+
+ Use the <a href="#vbps">VBProjects</a> collection to access the collection of projects.
+  Includes StartProject, FileName, Add, Item, Remove, SaveAs, etc.
+   A <a href="#vbp">VBProject</a> includes BuildFileName, Description, FileName, Type,
+    <a href="#refs">References</a>, <a href="#vbcs">VBComponents</a>, ReadProperty, WriteProperty, etc.
+     A <a href="#vbc">VBComponent</a> includes <a href="#cmod">CodeModule</a>, <a href="#frm">Designer</a>, IsDirty, Name,
+      <a href="#props">Properties</a>, Type, etc, as well as Activate, InsertFile,
+       ReadProperty, WriteProperty, Reload, and SaveAs methods.
+
+ Use the <a href="#cpns">CodePanes</a> collection to access the collection of code panes.
+  Includes Count, Item. A <a href="#cpn">CodePane</a> includes CodeModule, CodePaneView,
+   CountOfVisibleLines, TopLine, GetSelection, SetSelection, etc.
+    A <a href="#cmod">CodeModule</a> includes AddFrom.., CountOfLines, <a href="#mems">Members</a>, Find,
+     ProcLines, DeleteLines, InsertLine, ReplaceLine, etc.
+
+ Use the <a href="#cbs">CommandBars</a> collection to access the collection of command bars.
+  This collection belongs to the Microsoft Office 8.0 Object Library.
+   Includes Add, Count, Item, DisplayTooltips, MenuAnimationStyle, etc.
+
+ Use the <a href="#evs">Events</a> object to connect all Visual Basic for Applications events.
+
+ All objects in this model have a VBE property that points to the <a href="#vbe">VBE</a> object.</span>
+<a name="vbe">&#160;</a>
+<span class="comment">' Top-level extensibility object.</span>
+<span class="keyword">With </span><span class="identifier">VBInstance </span><span class="comment">' As VBIDE.VBE</span>
+    <span class="identifier">.ActiveCodePane      </span><span class="comment">' As <a href="#cpn">CodePane</a> - Returns the active or last active CodePane _
+                                         object or sets the active CodePane object.</span>
+    <span class="identifier">.ActiveVBProject     </span><span class="comment">' As <a href="#vbp">VBProject</a> - Returns the active project in the Project window.</span>
+    <span class="identifier">.ActiveWindow        </span><span class="comment">' As <a href="#win">Window</a> - Returns the active window.</span>
+    <span class="identifier">.Addins              </span><span class="comment">' As <a href="#ads">Addins</a> - Returns the Addins collection.</span>
+    <span class="identifier">.CodePanes           </span><span class="comment">' As <a href="#cpns">CodePanes</a> - Returns the collection of active CodePane objects.</span>
+    <span class="identifier">.CommandBars         </span><span class="comment">' As <a href="#cbs">CommandBars</a> - Contains all of the command bars in a project, _
+                                          including command bars that support shortcut menus.</span>
+    <span class="identifier">.DisplayModel        </span><span class="comment">' As <a href="#vbadm">vbext_VBADisplayModel</a> - Returns or sets the display model used _
+                                          by the system.</span>
+    <span class="identifier">.Events              </span><span class="comment">' As <a href="#evs">Events</a> - Returns the Events Object.</span>
+    <span class="identifier">.FullName            </span><span class="comment">' As String - Returns the full path name of the Visual Basic exe.</span>
+    <span class="identifier">.LastUsedPath        </span><span class="comment">' As String - Returns or sets the last path used in a file dialog box.</span>
+    <span class="identifier">.MainWindow          </span><span class="comment">' As <a href="#win">Window</a> - Returns a Window object representing the main window of _
+                                       the Visual Basic development environment.</span>
+    <span class="identifier">.Name                </span><span class="comment">' As String - Returns a String containing the name of the object. _
+                                       (default member of VBIDE.VBE)</span>
+    <span class="identifier">.ReadOnlyMode        </span><span class="comment">' As Integer - Returns or sets a value that determines how the VB _
+                                        development environment interacts with read-only files.</span>
+    <span class="identifier">.SelectedVBComponent </span><span class="comment">' As <a href="#vbc">VBComponent</a> - Returns the selected component.</span>
+    <span class="identifier">.TemplatePath        </span><span class="comment">' As String - Returns the fully qualified path location for template files.</span>
+    <span class="identifier">.VBProjects          </span><span class="comment">' As <a href="#vbps">VBProjects</a> - Returns the VBProjects collection, representing all the _
+                                           projects that are open in the development environment.</span>
+    <span class="identifier">.Version             </span><span class="comment">' As String - Returns a String containing the version of Visual Basic _
+                                       for Applications that the application is using.</span>
+    <span class="identifier">.Windows             </span><span class="comment">' As <a href="#wins">Windows</a> - Returns the collection of Window objects.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Quit()              </span><span class="comment">' Attempts to exit the development environment.</span>
+<span class="keyword">End With</span>
+<a name="vbadm">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_VBADisplayModel</span>
+  <span class="event">vbext_dm_MDI</span>
+  <span class="event">vbext_dm_SDI</span>
+<span class="keyword">End Enum</span>
+<a name="wins">&#160;</a>
+<span class="comment">' The collection of all windows in the development environment.</span>
+<span class="keyword">With </span><span class="identifier">.Windows </span><span class="comment">' As Windows</span>
+    <span class="identifier">.Count      </span><span class="comment">' As Long - Returns the number of items in the collection.</span>
+    <span class="identifier">.Parent     </span><span class="comment">' As <a href="#vbe">VBE</a> - Returns the parent VBE object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.CreateToolWindow() </span><span class="comment">' As <a href="#win">Window</a> - Creates a new Tool window containing the indicated DocObject.</span>
+    <span class="identifier">.Item()             </span><span class="comment">' As Window - (default member) Returns the indexed item from the collection, _
+                                        where index is the name or index number of the item.</span>
+<span class="keyword">End With</span>
+
+<span class="text">View <A HREF="MoreInfo/MoreMSDN/VBToolWindAddin.htm">VBToolWindAddin.htm</A> (Use back button)</span>
+<a name="win">&#160;</a>
+<span class="comment">'With .MainWindow ' As Window</span>
+<span class="comment">' Returns a Window object representing the main window of the Visual Basic development
+' environment. You can use the Window object returned by the MainWindow property to add
+' or remove docked windows. You can also use the Window object returned by the MainWindow
+' property to maximize, minimize, hide, or restore the main window of the VB IDE.</span>
+
+<span class="comment">' The Window object represents a window in the development environment.</span>
+<span class="keyword">With </span><span class="identifier">.ActiveWindow </span><span class="comment">' As Window</span>
+    <span class="identifier">.Caption           </span><span class="comment">' As String - Returns the title of the active window.</span>
+    <span class="identifier">.Collection        </span><span class="comment">' As <a href="#wins">Windows</a> - Returns the Windows collection that contains the Window.</span>
+    <span class="identifier">.Height            </span><span class="comment">' As Long - Returns or sets the height of the window in twips.</span>
+    <span class="identifier">.Left              </span><span class="comment">' As Long - Returns or sets the left edge on the screen in twips.</span>
+    <span class="identifier">.LinkedWindowFrame </span><span class="comment">' As Window - Returns the Window object frame that contains the window.</span>
+    <span class="identifier">.LinkedWindows     </span><span class="comment">' As <a href="#lwins">LinkedWindows</a> - Returns the collection of all linked windows _
+                                            contained in a linked window frame.</span>
+    <span class="identifier">.Top               </span><span class="comment">' As Long - Returns or sets the top of the window on the screen in twips.</span>
+    <span class="identifier">.Type              </span><span class="comment">' As <a href="#vbwt">vbext_WindowType</a> - Returns the type of window.</span>
+    <span class="identifier">.Visible           </span><span class="comment">' As Boolean - Returns or sets the visibility of the window.</span>
+    <span class="identifier">.Width             </span><span class="comment">' As Long - Returns or sets the width of the window in twips.</span>
+    <span class="identifier">.WindowState       </span><span class="comment">' As <a href="#vbws">vbext_WindowState</a> - Returns or sets the visual state of the window.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Close()           </span><span class="comment">' Closes the window.</span>
+    <span class="identifier">.SetFocus()        </span><span class="comment">' Moves the focus to the window.</span>
+<span class="keyword">End With</span>
+<a name="vbwt">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_WindowType</span>
+  <span class="event">vbext_wt_Browser</span>
+  <span class="event">vbext_wt_CodeWindow</span>
+  <span class="event">vbext_wt_ColorPalette</span>
+  <span class="event">vbext_wt_Designer</span>
+  <span class="event">vbext_wt_Find</span>
+  <span class="event">vbext_wt_FindReplace</span>
+  <span class="event">vbext_wt_Immediate</span>
+  <span class="event">vbext_wt_LinkedWindowFrame</span>
+  <span class="event">vbext_wt_Locals</span>
+  <span class="event">vbext_wt_MainWindow</span>
+  <span class="event">vbext_wt_Preview</span>
+  <span class="event">vbext_wt_ProjectWindow</span>
+  <span class="event">vbext_wt_Toolbox</span>
+  <span class="event">vbext_wt_Watch</span>
+<span class="keyword">End Enum</span>
+<a name="vbws">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_WindowState</span>
+  <span class="event">vbext_ws_Maximize</span>
+  <span class="event">vbext_ws_Minimize</span>
+  <span class="event">vbext_ws_Normal</span>
+<span class="keyword">End Enum</span>
+<a name="lwins">&#160;</a>
+<span class="comment">'With .ActiveWindow.LinkedWindows </span><span class="comment">' As LinkedWindows</span>
+<span class="comment">'With .Windows(0).LinkedWindows </span><span class="comment">' As LinkedWindows</span>
+
+<span class="keyword">With </span><span class="identifier">.MainWindow.LinkedWindows </span><span class="comment">' As LinkedWindows</span>
+    <span class="identifier">.Count </span><span class="comment">' As Long - Returns the number of items in the collection.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Add()    </span><span class="comment">' Adds a Window object to the collection.</span>
+    <span class="identifier">.Item()   </span><span class="comment">' As <a href="#win">Window</a> - (default member) Returns a Window object from the collection.</span>
+    <span class="identifier">.Remove() </span><span class="comment">' Removes a Window item from the collection.</span>
+<span class="keyword">End With</span>
+<a name="ads">&#160;</a>
+<span class="comment">' The collection of all AddIn objects that are accessible in the IDE.</span>
+<span class="keyword">With </span><span class="identifier">.Addins </span><span class="comment">' As Addins</span>
+    <span class="identifier">.Count   </span><span class="comment">' As Long - Returns the number of items in a collection.</span>
+    <span class="identifier">.Parent  </span><span class="comment">' As <a href="#vbe">VBE</a> - Returns the parent VBE object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Item()   </span><span class="comment">' As <a href="#adin">Addin</a> - (default member) Returns the specified item from the collection.</span>
+    <span class="identifier">.Update() </span><span class="comment">' Refreshes the Addins collection from the registry just as if the user _
+                had opened the Add-in Manager dialog box.</span>
+<span class="keyword">End With</span>
+<a name="adin">&#160;</a>
+<span class="comment">' The AddIn object provides information about an add-in for other add-ins.</span>
+<span class="keyword">With </span><span class="identifier">.Addins.Item(0) </span><span class="comment">' As Addin</span>
+    <span class="identifier">.Collection   </span><span class="comment">' As <a href="#ads">Addins</a> - Returns the collection that contains the add-in.</span>
+    <span class="identifier">.Connect      </span><span class="comment">' As Boolean - Returns or sets the connected state of an add-in.</span>
+    <span class="identifier">.Description  </span><span class="comment">' As String - (default member) Returns or sets the description associated _
+                                with the add-in. Can be set only in the OnConnection Event.</span>
+    <span class="identifier">.Guid         </span><span class="comment">' As String - Returns the class identifier of the add-in.</span>
+    <span class="identifier">.Object       </span><span class="comment">' As Object - Returns or sets the object returned by the add-in. _
+                                Can be set only in the OnConnection event.</span>
+    <span class="identifier">.ProgId       </span><span class="comment">' As String - Returns the progID of the add-in.</span>
+<span class="keyword">End With</span>
+
+<span class="event">AddinInstance</span> <span class="comment">' AddInDesignerObjects <a href="#aie">events</a>.</span>
+<a name="vbps">&#160;</a>
+<span class="comment">' Represents all the projects that are open in the development environment.</span>
+<span class="keyword">With </span><span class="identifier">.VBProjects </span><span class="comment">' As VBProjects</span>
+    <span class="identifier">.Count       </span><span class="comment">' As Long - Returns the number of items in the collection.</span>
+    <span class="identifier">.IconState   </span><span class="comment">' As <a href="#vbsccs">vbextSCCStatus</a> - Returns or sets the source code control _
+                                       icon or 'glyph' for the project in the _
+                                       project window, indicating its status.</span>
+    <span class="identifier">.Parent       </span><span class="comment">' As VBE - Returns the parent VBE object.</span>
+    <span class="identifier">.StartProject </span><span class="comment">' As <a href="#vbp">VBProject</a> - Returns or sets the project that will be _
+                                   started when the user presses the F5 key.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Add()             </span><span class="comment">' As VBProject - Adds a new VBProject object to the collection.</span>
+    <span class="identifier">.AddFromFile()     </span><span class="comment">' As <a href="#nvbps">VBNewProjects</a> - Adds or opens a project or group project _
+                         and returns a collection of all projects added using AddFromFile.</span>
+    <span class="identifier">.AddFromTemplate() </span><span class="comment">' As <a href="#nvbps">VBNewProjects</a> - Creates a new project using an existing project _
+                         as a template and returns a collection that contains all projects _
+                         added using AddFromTemplate.</span>
+    <span class="identifier">.FileName()        </span><span class="comment">' As String - Returns the fully qualified path to the group project file.</span>
+    <span class="identifier">.Item()            </span><span class="comment">' As VBProject - (default member) Returns the indexed item from the collection, _
+                                          where index is the name or index number of the item.</span>
+    <span class="identifier">.Remove()          </span><span class="comment">' Removes a VBProject item from the collection.</span>
+    <span class="identifier">.SaveAs()          </span><span class="comment">' Saves to a specified location using a new file name.</span>
+    <span class="comment">'</span>
+    <span class="event">ItemActivated </span><span class="comment">' Occurs after a VBProject is activated.  <a href="#evs">Events</a></span>
+    <span class="event">ItemAdded     </span><span class="comment">' Occurs after a VBProject is added.</span>
+    <span class="event">ItemRemoved   </span><span class="comment">' Occurs after a VBProject is removed.</span>
+    <span class="event">ItemRenamed   </span><span class="comment">' Occurs after a VBProject is renamed.</span>
+<span class="keyword">End With</span>
+<a name="nvbps">&#160;</a>
+<span class="comment">'With .VBProjects.AddFromTemplate() ' As VBNewProjects</span>
+
+<span class="comment">' Represents all the projects added as a result of an AddFrom.. operation.</span>
+<span class="keyword">With </span><span class="identifier">.VBProjects.AddFromFile() </span><span class="comment">' As VBNewProjects</span>
+    <span class="identifier">Count </span><span class="comment">' As Long - Returns the number of objects in the collection.</span>
+    <span class="comment">'</span>
+    <span class="identifier">Item() </span><span class="comment">' As <a href="#vbp">VBProject</a> - (default member) Returns the specified item from the collection.</span>
+<span class="keyword">End With</span>
+<a name="vbp">&#160;</a>
+<span class="comment">'With .VBProjects(0) ' As VBProject</span>
+<span class="comment">'With .VBProjects.StartProject ' As VBProject</span>
+
+<span class="comment">' Use the VBProject object to set properties for the project, to access
+' the VBComponents collection, and to access the References collection.</span>
+<span class="keyword">With </span><span class="identifier">.ActiveVBProject </span><span class="comment">' As VBProject</span>
+    <span class="identifier">.BuildFileName       </span><span class="comment">' As String - Returns or sets a String containing the .exe or .dll name _
+                                       that will be used when the project is built.</span>
+    <span class="identifier">.Collection          </span><span class="comment">' As <a href="#vbps">VBProjects</a> - Returns the collection ???</span>
+    <span class="identifier">.CompatibleOleServer </span><span class="comment">' As String - Returns or sets a String containing the compatible Automation _
+                                       server for the project.</span>
+    <span class="identifier">.Description         </span><span class="comment">' As String - Returns or sets a string description of the project.</span>
+    <span class="identifier">.FileName            </span><span class="comment">' As String - Returns or sets the path and file name.</span>
+    <span class="identifier">.HelpContextID       </span><span class="comment">' As Long -  Returns or sets the context ID for a topic in the Ms Help file.</span>
+    <span class="identifier">.HelpFile            </span><span class="comment">' As String - Returns or sets a String specifying the Microsoft Windows Help.</span>
+    <span class="identifier">.IconState           </span><span class="comment">' As <a href="#vbsccs">vbextSCCStatus</a> - Returns or sets the source code control icon or 'glyph' _
+                               for the project in the Project window, indicating the project's status.</span>
+    <span class="identifier">.IsDirty             </span><span class="comment">' As Boolean - Returns a Boolean value indicating whether or not the object _
+                                        was edited since the last time it was saved.</span>
+    <span class="identifier">.Name                </span><span class="comment">' As String - Returns (or sets?) the Project Name.</span>
+    <span class="identifier">.References          </span><span class="comment">' As <a href="#refs">References</a> - Returns the set of references in the project.</span>
+    <span class="identifier">.Saved               </span><span class="comment">' As Boolean - Returns a Boolean indicating whether the project has been saved.</span>
+    <span class="identifier">.StartMode           </span><span class="comment">' As <a href="#vbpsm">vbext_ProjectStartMode</a> - Returns or sets the start mode of the project.</span>
+    <span class="identifier">.Type                </span><span class="comment">' As <a href="#vbpt">vbext_ProjectType</a> - Returns the type of the project.</span>
+    <span class="identifier">.VBComponents        </span><span class="comment">' As <a href="#vbcs">VBComponents</a> - Returns the components contained in the project.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.AddToolboxProgID()  </span><span class="comment">' Places a control or embedded component in the toolbox &amp; adds a project reference.</span>
+    <span class="identifier">.MakeCompiledFile()  </span><span class="comment">' Writes out the project as an exe, dll, or ocx, depending on the project type.</span>
+    <span class="identifier">.ReadProperty()      </span><span class="comment">' As String - Reads custom sections and values from the .vbp file.</span>
+    <span class="identifier">.SaveAs()            </span><span class="comment">' Saves to a specified location using a new file name.</span>
+    <span class="identifier">.WriteProperty()     </span><span class="comment">' Writes custom sections and values to the .vbp file.</span>
+<span class="keyword">End With</span>
+
+<span class="event">FileControlEvents</span>   <span class="comment">' Project file control <a href="#fctle">events</a>.</span>
+<a name="vbpsm">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_ProjectStartMode</span>
+  <span class="event">vbext_psm_OleServer</span>
+  <span class="event">vbext_psm_StandAlone</span>
+<span class="keyword">End Enum</span>
+<a name="vbpt">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_ProjectType</span>
+  <span class="event">vbext_pt_ActiveXControl</span>
+  <span class="event">vbext_pt_ActiveXDll</span>
+  <span class="event">vbext_pt_ActiveXExe</span>
+  <span class="event">vbext_pt_StandardExe</span>
+<span class="keyword">End Enum</span>
+<a name="vbsccs">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbextSCCStatus</span>
+  <span class="event">vbextSCCStatusCheckedOut    </span><span class="comment">' File is checked out to the current user</span>
+  <span class="event">vbextSCCStatusControlled    </span><span class="comment">' File is under source code control</span>
+  <span class="event">vbextSCCStatusNotControlled </span><span class="comment">' File is not under source code control</span>
+  <span class="event">vbextSCCStatusOutOfDate     </span><span class="comment">' File is not the most recent</span>
+  <span class="event">vbextSCCStatusOutOther      </span><span class="comment">' File is checked out to another user</span>
+  <span class="event">vbextSCCStatusShared        </span><span class="comment">' File is shared between projects</span>
+<span class="keyword">End Enum</span>
+<a name="refs">&#160;</a>
+<span class="comment">' Returns the set of references in the project.</span>
+<span class="keyword">With </span><span class="identifier">.VBProjects(0).References </span><span class="comment">' As References</span>
+    <span class="identifier">.Count  </span><span class="comment">' As Long - Returns the number of items in the collection.</span>
+    <span class="identifier">.Parent </span><span class="comment">' As <a href="#vbp">VBProject</a> - Returns the parent object or collection.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.AddFromFile() </span><span class="comment">' As <a href="#ref">Reference</a> - Adds a reference to a project from a file.</span>
+    <span class="identifier">.AddFromGuid() </span><span class="comment">' As Reference - Adds a reference to the References collection using _
+                                    the globally unique identifier (GUID) of the reference.</span>
+    <span class="identifier">.Item()        </span><span class="comment">' As Reference - (default member) Returns the indexed item from the collection, _
+                                              where index is the name or index number of the item.</span>
+    <span class="identifier">.Remove()      </span><span class="comment">' Removes a Reference item from a collection.</span>
+    <span class="comment">'</span>
+    <span class="event">ItemAdded   </span><span class="comment">' (default member) Occurs after a Reference is added.  <a href="#evs">Events</a></span>
+    <span class="event">ItemRemoved </span><span class="comment">' Occurs after a Reference is removed from a project.</span>
+<span class="keyword">End With</span>
+<a name="ref">&#160;</a>
+<span class="comment">' Represents a reference to a type library or a project.</span>
+<span class="keyword">With </span><span class="identifier">.VBProjects(0).References(0) </span><span class="comment">' As Reference</span>
+    <span class="identifier">.BuiltIn     </span><span class="comment">' As Boolean - Returns whether the reference is a default reference that can't be removed.</span>
+    <span class="identifier">.Collection  </span><span class="comment">' As <a href="#refs">References</a> - Returns the collection that contains the object.</span>
+    <span class="identifier">.Description </span><span class="comment">' As String - Returns a description associated with the reference.</span>
+    <span class="identifier">.FullPath    </span><span class="comment">' As String - Returns the path and file name of the reference.</span>
+    <span class="identifier">.Guid        </span><span class="comment">' As String - Returns the class identifier of the reference.</span>
+    <span class="identifier">.IsBroken    </span><span class="comment">' As Boolean - Returns whether the Reference object points to a valid reference in the registry.</span>
+    <span class="identifier">.Major       </span><span class="comment">' As Long - Returns the major version number of the reference.</span>
+    <span class="identifier">.Minor       </span><span class="comment">' As Long - Returns the minor version number of the reference.</span>
+    <span class="identifier">.Name        </span><span class="comment">' As String - Returns the name used in code to identify the reference.</span>
+    <span class="identifier">.Type        </span><span class="comment">' As <a href="#vbrk">vbext_RefKind</a> - Returns the type of object.</span>
+<span class="keyword">End With</span>
+<a name="vbrk">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_RefKind</span>
+  <span class="event">vbext_rk_Project</span>
+  <span class="event">vbext_rk_TypeLib</span>
+<span class="keyword">End Enum</span>
+<a name="vbcs">&#160;</a>
+<span class="comment">'With .VBProjects.StartProject.VBComponents </span><span class="comment">' As VBComponents</span>
+<span class="comment">'With .ActiveVBProject.VBComponents </span><span class="comment">' As VBComponents</span>
+
+<span class="comment">' Represents the components contained in a project.</span>
+<span class="keyword">With </span><span class="identifier">.VBProjects(0).VBComponents </span><span class="comment">' As VBComponents</span>
+    <span class="identifier">.Count         </span><span class="comment">' As Long - Returns the number of items in the collection.</span>
+    <span class="identifier">.Parent        </span><span class="comment">' As <a href="#vbp">VBProject</a> - Returns the parent VBProject object.</span>
+    <span class="identifier">.StartUpObject </span><span class="comment">' As Variant - Returns the startup component for the project. The returned _
+                                  variant contains either an enumerated <a href="#vbso">vbext_StartupObject</a> value _
+                                  or a <a href="#vbc">VBComponent</a> object that represents the startup object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Add()             </span><span class="comment">' As <a href="#vbc">VBComponent</a> - Adds an object to the collection.</span>
+    <span class="identifier">.AddCustom()       </span><span class="comment">' As VBComponent - Creates a new component and returns it.</span>
+    <span class="identifier">.AddFile()         </span><span class="comment">' As VBComponent - Creates a new component from file and returns it.</span>
+    <span class="identifier">.AddFromTemplate() </span><span class="comment">' As VBComponent - Creates a new component from a template and returns it.</span>
+    <span class="identifier">.Item()            </span><span class="comment">' As VBComponent - (default member) Returns the indexed item from the collection, _
+                                            where index is the name or index number of the item.</span>
+    <span class="identifier">.Remove()          </span><span class="comment">' Removes a VBComponent item from the collection.</span>
+    <span class="comment">'</span>
+    <span class="event">ItemActivated </span><span class="comment">' Occurs after a VBComponent is activated.  <a href="#evs">Events</a></span>
+    <span class="event">ItemAdded     </span><span class="comment">' Occurs after a VBComponent is added.</span>
+    <span class="event">ItemReloaded  </span><span class="comment">' Occurs after a VBComponent is reloaded</span>
+    <span class="event">ItemRemoved   </span><span class="comment">' Occurs after a VBComponent is removed.</span>
+    <span class="event">ItemRenamed   </span><span class="comment">' Occurs after a VBComponent renamed.</span>
+    <span class="event">ItemSelected  </span><span class="comment">' Occurs after a VBComponent is selected.</span>
+<span class="keyword">End With</span>
+<a name="vbso">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_StartupObject</span>
+  <span class="event">vbext_so_None</span>
+  <span class="event">vbext_so_SubMain</span>
+<span class="keyword">End Enum</span>
+<a name="vbc">&#160;</a>
+<span class="comment">'With .ActiveCodePane.CodeModule.Parent ' As VBComponent</span>
+<span class="comment">'With .CodePanes(0).CodeModule.Parent ' As VBComponent</span>
+<span class="comment">'With .ActiveVBProject.VBComponents(0) ' As VBComponent</span>
+<span class="comment">'With .VBProjects(0).VBComponents(0) ' As VBComponent</span>
+
+<span class="comment">' The SelectedVBComponent property returns the selected component in the Project window.
+' If the selected item isn't a component, SelectedVBComponent returns Nothing.
+' Represents a form or class module, user document, standard module, etc.</span>
+<span class="keyword">With </span><span class="identifier">.SelectedVBComponent </span><span class="comment">' As VBComponent</span>
+    <span class="identifier">.CodeModule      </span><span class="comment">' As <a href="#cmod">CodeModule</a> - Returns an object representing the code behind the component.</span>
+    <span class="identifier">.Collection      </span><span class="comment">' As <a href="#vbcs">VBComponents</a> - Returns the collection that contains the object.</span>
+    <span class="identifier">.Description     </span><span class="comment">' As String</span>
+    <span class="identifier">.Designer        </span><span class="comment">' As <a href="#frm">Object</a> - Returns the object that enables you to access the design _
+                                   characteristics of a component.</span>
+    <span class="identifier">.DesignerID      </span><span class="comment">' As String</span>
+    <span class="identifier">.FileCount       </span><span class="comment">' As Integer - Returns the number of files associated with the component.</span>
+    <span class="identifier">.FileNames       </span><span class="comment">' As String - Returns the names of the files associated with a component.</span>
+    <span class="identifier">.HasOpenDesigner </span><span class="comment">' As Boolean - Returns a Boolean value indicating whether or not the _
+                                    VBComponent object has an open designer.</span>
+    <span class="identifier">.HelpContextID   </span><span class="comment">' As Long</span>
+    <span class="identifier">.IconState       </span><span class="comment">' As Long - Returns or sets the source code control icon or 'glyph' for _
+                                 the project in the project window, indicating its status.</span>
+    <span class="identifier">.IsDirty         </span><span class="comment">' As Boolean - Returns whether edited since the last time it was saved.</span>
+    <span class="identifier">.Name            </span><span class="comment">' As String - Returns or sets the name of the component.</span>
+    <span class="identifier">.Properties      </span><span class="comment">' As <a href="#props">Properties</a> - Returns the properties of the object.</span>
+    <span class="identifier">.Type            </span><span class="comment">' As <a href="#vbct">vbext_ComponentType</a> - Returns the type of object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Activate()       </span><span class="comment">' Activates the component.</span>
+    <span class="identifier">.DesignerWindow() </span><span class="comment">' As <a href="#win">Window</a> - Returns the Window object that represents the component's designer.</span>
+    <span class="identifier">.InsertFile()     </span><span class="comment">' Inserts code from a file into the code module.</span>
+    <span class="identifier">.ReadProperty()   </span><span class="comment">' As String - Returns the specified user-defined section and key in the component file.</span>
+    <span class="identifier">.Reload()         </span><span class="comment">' Reloads the object from disk.</span>
+    <span class="identifier">.SaveAs()         </span><span class="comment">' As Boolean - Saves the component using a new file name.</span>
+    <span class="identifier">.WriteProperty()  </span><span class="comment">' Writes custom sections and values to the component files.</span>
+<span class="keyword">End With</span>
+<a name="vbct">&#160;</a>
+<span class="comment">' Determine the Type of Designer object</span>
+<span class="keyword">With </span><span class="identifier">.SelectedVBComponent </span><span class="comment">' As VBComponent</span>
+    <span class="keyword">Select Case </span><span class="identifier">.Type</span> <span class="comment">' As VBIDE.vbext_ComponentType</span>
+        <span class="keyword">Case </span><span class="event">vbext_ct_ClassModule, vbext_ct_RelatedDocument, _
+             vbext_ct_ResFile, vbext_ct_StdModule</span>
+            <span class="comment">' Designer == Nothing</span>
+        <span class="keyword">Case </span><span class="event">vbext_ct_ActiveXDesigner, vbext_ct_DocObject, vbext_ct_UserControl, _
+             vbext_ct_PropPage, vbext_ct_MSForm, vbext_ct_VBForm, vbext_ct_VBMDIForm</span>
+            <span class="comment">'If .HasOpenDesigner Then</span>
+                <span class="keyword">Dim </span><span class="identifier">frm </span><span class="keyword">As </span><span class="identifier">VBIDE.<a href="#frm">VBForm</a></span>
+                <span class="keyword">Set </span><span class="identifier">frm = .Designer</span>
+            <span class="comment">'End If</span>
+    <span class="keyword">End Select</span>
+<span class="keyword">End With</span>
+<a name="cpns">&#160;</a>
+<span class="comment">' Contains the active code panes in the VBE object.</span>
+<span class="keyword">With </span><span class="identifier">.CodePanes </span><span class="comment">' As CodePanes</span>
+    <span class="identifier">.Count  </span><span class="comment">' As Long - Returns the number of items in a collection.</span>
+    <span class="identifier">.Parent </span><span class="comment">' As <a href="#vbe">VBE</a> - Returns the parent VBE object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Item() </span><span class="comment">' As <a href="#cpn">CodePane</a> - (default member) Returns the specified item from the collection.</span>
+<span class="keyword">End With</span>
+<a name="cpn">&#160;</a>
+<span class="comment">'With .CodePanes(0) ' As CodePane</span>
+<span class="comment">'With .SelectedVBComponent.CodeModule.CodePane ' As CodePane</span>
+
+<span class="comment">' The code pane window in which code is displayed.</span>
+<span class="keyword">With </span><span class="identifier">.ActiveCodePane </span><span class="comment">' As CodePane</span>
+    <span class="identifier">.CodeModule          </span><span class="comment">' As <a href="#cmod">CodeModule</a> - Returns the code module associated with the CodePane.</span>
+    <span class="identifier">.CodePaneView        </span><span class="comment">' As <a href="#vbcpv">vbext_CodePaneview</a> - Specifies the code pane view.</span>
+    <span class="identifier">.Collection          </span><span class="comment">' As <a href="#cpns">CodePanes</a> - Returns the collection that contains the code panes.</span>
+    <span class="identifier">.CountOfVisibleLines </span><span class="comment">' As Long - Number of lines visible in the code pane.</span>
+    <span class="identifier">.TopLine             </span><span class="comment">' As Long - The line number of the line at the top of the code pane or _
+                                     sets the line showing at the top of the code pane.</span>
+    <span class="identifier">.Window              </span><span class="comment">' As <a href="#win">Window</a> - Returns the window in which the code pane is displayed.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.GetSelection()      </span><span class="comment">' Returns the StartLine, StartColumn, EndLine and EndColumn _
+                                        co-ordinates of the selection in a code pane.</span>
+    <span class="identifier">.SetSelection()      </span><span class="comment">' Sets the selection in the code pane.</span>
+    <span class="identifier">.Show()              </span><span class="comment">' Makes the specified code pane the visible code pane in its window.</span>
+<span class="keyword">End With</span>
+<a name="vbcpv">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_CodePaneview</span>
+  <span class="event">vbext_cv_ProcedureView</span>
+  <span class="event">vbext_cv_FullModuleView</span>
+<span class="keyword">End Enum</span>
+<a name="cmod">&#160;</a>
+<span class="comment">'With .SelectedVBComponent.CodeModule ' As CodeModule</span>
+
+<span class="comment">' Represents the code behind a component, such as a form, class, or document.</span>
+<span class="keyword">With </span><span class="identifier">.CodePanes(0).CodeModule </span><span class="comment">' As CodeModule</span>
+    <span class="identifier">.CodePane       </span><span class="comment">' As <a href="#cpn">CodePane</a> - Returns the code pane associated with the CodeModule.</span>
+    <span class="identifier">.CountOfDeclarationLines </span><span class="comment">' As Long - Returns the number of lines in the declarations section.</span>
+    <span class="identifier">.CountOfLines            </span><span class="comment">' As Long - Returns the number of lines of code in a code module.</span>
+    <span class="identifier">.Lines          </span><span class="comment">' As String - Returns the specified block of lines.</span>
+    <span class="identifier">.Members        </span><span class="comment">' As <a href="#mems">Members</a> - Contains identifiers that have module-level scope and can be _
+                                   considered properties, methods, or events of the code module.</span>
+    <span class="identifier">.Parent         </span><span class="comment">' As <a href="#vbc">VBComponent</a> - Returns the parent VBComponent object.</span>
+    <span class="identifier">.ProcBodyLine   </span><span class="comment">' As Long - Returns the first line of a procedure (see also ProcStartLine). _
+                                Argument ProcKind As <a href="#vbpk">vbext_ProcKind</a></span>
+    <span class="identifier">.ProcCountLines </span><span class="comment">' As Long - Returns the number of lines in the specified procedure.</span>
+    <span class="identifier">.ProcOfLine     </span><span class="comment">' As String - Returns the name of procedure that contains the specified line.</span>
+    <span class="identifier">.ProcStartLine  </span><span class="comment">' As Long - Returns the line at which the specified procedure begins.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.AddFromFile()     </span><span class="comment">' Adds the contents of a file to a module.</span>
+    <span class="identifier">.AddFromString()   </span><span class="comment">' Inserts text, starting on the line preceding the first procedure. _
+                         If no procedures, places the text at the end of the module.</span>
+    <span class="identifier">.CreateEventProc() </span><span class="comment">' Creates an event procedure. Returns a Long.</span>
+    <span class="identifier">.DeleteLines()     </span><span class="comment">' Deletes a single line of code or a specified range of lines.</span>
+    <span class="identifier">.Find()            </span><span class="comment">' Searches a code module for a specified string. Returns True if found.</span>
+    <span class="identifier">.InsertLines()     </span><span class="comment">' Inserts a line or lines of code at the specified location.</span>
+    <span class="identifier">.ReplaceLine()     </span><span class="comment">' Replaces an existing line of code with a specified line of code.</span>
+<span class="keyword">End With</span>
+<a name="vbpk">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_ProcKind</span>
+  <span class="event">vbext_pk_Get  </span><span class="comment">' Specifies a procedure that returns the value of a property.</span>
+  <span class="event">vbext_pk_Let  </span><span class="comment">' Specifies a procedure that assigns a value to a property.</span>
+  <span class="event">vbext_pk_Proc </span><span class="comment">' Specifies all procedures other than property procedures.</span>
+  <span class="event">vbext_pk_Set  </span><span class="comment">' Specifies a procedure that sets a reference to an object.</span>
+<span class="keyword">End Enum</span>
+<a name="mems">&#160;</a>
+<span class="keyword">With </span><span class="identifier">.CodePanes(0).CodeModule.Members </span><span class="comment">' As Members</span>
+    <span class="identifier">.Count  </span><span class="comment">' As Long - Returns the number of items in the collection.</span>
+    <span class="identifier">.Parent </span><span class="comment">' As <a href="#cmod">CodeModule</a> - Returns the parent CodeModule object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Item() </span><span class="comment">' As <a href="#mem">Member</a> - (default member) Returns the specified item from the collection.</span>
+<span class="keyword">End With</span>
+<a name="mem">&#160;</a>
+<span class="comment">'With .SelectedVBComponent.CodeModule.Members(0) </span><span class="comment">' As Member</span>
+
+<span class="comment">' Represents a mixture of code-based properties and</span>
+<span class="comment">' type library-based attributes of public members.</span>
+<span class="keyword">With </span><span class="identifier">.CodePanes(0).CodeModule.Members(0) </span><span class="comment">' As Member</span>
+    <span class="identifier">.Bindable       </span><span class="comment">' As Boolean - Returns or sets the Bindable attribute.</span>
+    <span class="identifier">.Browsable      </span><span class="comment">' As Boolean - Returns or sets the Browsable attribute</span>
+    <span class="identifier">.Category       </span><span class="comment">' As String</span>
+    <span class="identifier">.CodeLocation   </span><span class="comment">' As Long - Returns the line where the member is defined.</span>
+    <span class="identifier">.Collection     </span><span class="comment">' As <a href="#mems">Members</a> - (default member) Returns the collection that contains the object.</span>
+    <span class="identifier">.DefaultBind    </span><span class="comment">' As Boolean - Returns or sets the DefaultBind attribute.</span>
+    <span class="identifier">.Description    </span><span class="comment">' As String - Returns or sets string description associated with the object.</span>
+    <span class="identifier">.DisplayBind    </span><span class="comment">' As Boolean - Returns or sets the DisplayBind attribute.</span>
+    <span class="identifier">.HelpContextID  </span><span class="comment">' As Long - Returns or sets a String containing the context ID for a topic _
+                                in a Microsoft Windows Help file.</span>
+    <span class="identifier">.Hidden         </span><span class="comment">' As Boolean - Returns or sets the hidden attribute.</span>
+    <span class="identifier">.Name           </span><span class="comment">' As String - Returns or sets the name used in code to identify an object.</span>
+    <span class="identifier">.PropertyPage   </span><span class="comment">' As String</span>
+    <span class="identifier">.RequestEdit    </span><span class="comment">' As Boolean - Returns or sets the RequestEdit attribute.</span>
+    <span class="identifier">.Scope          </span><span class="comment">' As <a href="#vbms">vbext_Scope</a> - Returns the scope.</span>
+    <span class="identifier">.StandardMethod </span><span class="comment">' As Long - Returns or sets the DispID attribute.</span>
+    <span class="identifier">.Static         </span><span class="comment">' As Boolean - Returns True if the member is static.</span>
+    <span class="identifier">.Type           </span><span class="comment">' As <a href="#vbmt">vbext_MemberType</a> - Returns the member type.</span>
+    <span class="identifier">.UIDefault      </span><span class="comment">' As Boolean - Returns or sets the UIDefault attribute.</span>
+<span class="keyword">End With</span>
+<a name="vbms">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_Scope</span>
+  <span class="event">vbext_Friend</span>
+  <span class="event">vbext_Private</span>
+  <span class="event">vbext_Public</span>
+<span class="keyword">End Enum</span>
+<a name="vbmt">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_MemberType</span>
+  <span class="event">vbext_mt_Const</span>
+  <span class="event">vbext_mt_Event</span>
+  <span class="event">vbext_mt_Method</span>
+  <span class="event">vbext_mt_Property</span>
+  <span class="event">vbext_mt_Variable</span>
+<span class="keyword">End Enum</span>
+<a name="frm">&#160;</a>
+<span class="comment">'With .ActiveVBProject.VBComponents(0).Designer ' As VBForm</span>
+
+<span class="comment">' Represents a graphical designer object in a project. The components</span>
+<span class="comment">' Type property is one of the <a href="#vbct">vbext_ComponentType</a> enumeration values.</span>
+<span class="keyword">With </span><span class="identifier">.SelectedVBComponent.Designer </span><span class="comment">' As VBForm</span>
+    <span class="identifier">.CanPaste            </span><span class="comment">' As Boolean - Returns True if the contents of the Clipboard can be pasted to the form.</span>
+    <span class="identifier">.ContainedVBControls </span><span class="comment">' As <a href="#cctls">ContainedVBControls</a> - Returns the collection of contained controls on the form. _
+                                                    These are the controls placed directly on the form's surface.</span>
+    <span class="identifier">.Parent              </span><span class="comment">' As <a href="#vbc">VBComponent</a> - Returns the parent object or collection.</span>
+    <span class="identifier">.SelectedVBControls  </span><span class="comment">' As <a href="#sctls">SelectedVBControls</a> - Returns a collection of selected controls on the form.</span>
+    <span class="identifier">.VBControls          </span><span class="comment">' As <a href="#ctls">VBControls</a> - Returns a collection containing all controls on the form.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Paste()     </span><span class="comment">' Pastes the contents of the Clipboard onto the form.</span>
+    <span class="identifier">.SelectAll() </span><span class="comment">' As Long - Selects all the controls contained on the form.</span>
+<span class="keyword">End With</span>
+<a name="ctls">&#160;</a>
+<span class="comment">' Represents a collection of VBControl objects.</span>
+<span class="keyword">With </span><span class="identifier">.SelectedVBComponent.Designer.VBControls </span><span class="comment">' As VBControls</span>
+    <span class="identifier">.Count  </span><span class="comment">' As Long - Returns the number of objects in the collection.</span>
+    <span class="identifier">.Parent </span><span class="comment">' As Object - Returns the parent (Designer) object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Add()    </span><span class="comment">' As <a href="#vbc">VBControl</a> - Adds an object to the collection.</span>
+    <span class="identifier">.Item()   </span><span class="comment">' As VBControl - (default member) Returns the indexed item from the collection, _
+                                         where index is the name or index number of the item.</span>
+    <span class="identifier">.Remove() </span><span class="comment">' Removes an item from the collection.</span>
+    <span class="comment">'</span>
+    <span class="event">ItemAdded   </span><span class="comment">' Occurs after a control is added.  <a href="#evs">Events</a></span>
+    <span class="event">ItemRemoved </span><span class="comment">' Occurs after a control is removed.</span>
+    <span class="event">ItemRenamed </span><span class="comment">' Occurs after a control is renamed.</span>
+<span class="keyword">End With</span>
+<a name="sctls">&#160;</a>
+<span class="comment">' Returns a collection of selected VBControl objects.</span>
+<span class="keyword">With </span><span class="identifier">.SelectedVBComponent.Designer.SelectedVBControls </span><span class="comment">' As SelectedVBControls</span>
+    <span class="identifier">.Count  </span><span class="comment">' As Long - Returns the number of objects in the collection.</span>
+    <span class="identifier">.Parent </span><span class="comment">' As <a href="#frm">VBForm</a> - Returns the parent VBForm object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Clear() </span><span class="comment">' As Long - Removes all objects from the collection.</span>
+    <span class="identifier">.Copy()  </span><span class="comment">' Copies the selected controls to the Clipboard.</span>
+    <span class="identifier">.Cut()   </span><span class="comment">' Deletes the selected controls from the form.</span>
+    <span class="identifier">.Item()  </span><span class="comment">' As <a href="#vbc">VBControl</a> - (default member) Returns the specified item from the collection.</span>
+    <span class="comment">'</span>
+    <span class="event">ItemAdded   </span><span class="comment">' Occurs after a control is added.  <a href="#evs">Events</a></span>
+    <span class="event">ItemRemoved </span><span class="comment">' Occurs after a control is removed.</span>
+<span class="keyword">End With</span>
+<a name="cctls">&#160;</a>
+<span class="comment">' Represents a collection of contained VBControl objects.</span>
+<span class="keyword">With </span><span class="identifier">.SelectedVBComponent.Designer.ContainedVBControls </span><span class="comment">' As ContainedVBControls</span>
+    <span class="identifier">.Count  </span><span class="comment">' As Long - Returns the number of objects in the collection.</span>
+    <span class="identifier">.Parent </span><span class="comment">' As Object - Returns the parent object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Add()    </span><span class="comment">' As <a href="#vbc">VBControl</a> - Adds an object to the collection.</span>
+    <span class="identifier">.Item()   </span><span class="comment">' As VBControl - (default member) Returns the specified item from the collection.</span>
+    <span class="identifier">.Remove() </span><span class="comment">' Removes an item from the collection.</span>
+<span class="keyword">End With</span>
+<a name="vbc">&#160;</a>
+<span class="comment">'With .SelectedVBComponent.Designer.VBControls(0) ' As VBControl</span>
+<span class="comment">'With .SelectedVBComponent.Designer.SelectedVBControls(0) ' As VBControl</span>
+<span class="comment">'With .SelectedVBComponent.Designer.ContainedVBControls(0) ' As VBControl</span>
+
+<span class="comment">' If a control can act as a container - as is the case with picture boxes and</span>
+<span class="comment">' frames - it exposes a ContainedVBControls collection. This collection holds</span>
+<span class="comment">' one or more VBControl objects, which in turn might be containers themselves.</span>
+<span class="keyword">With </span><span class="identifier">.VBProjects(0).VBComponents(0).Designer.VBControls(0) </span><span class="comment">' As VBControl</span>
+    <span class="identifier">.ClassName           </span><span class="comment">' As String - (default member) Returns the class name of the control.</span>
+    <span class="identifier">.Collection          </span><span class="comment">' As <a href="#ctls">VBControls</a> - Returns the collection that contains this object.</span>
+    <span class="identifier">.ContainedVBControls </span><span class="comment">' As <a href="#cctls">ContainedVBControls</a> - Returns the collection of contained controls.</span>
+    <span class="identifier">.Container           </span><span class="comment">' As Object - Returns the containing control or form.</span>
+    <span class="identifier">.ControlObject       </span><span class="comment">' As Object - Returns the Control object.</span>
+    <span class="identifier">.ControlType         </span><span class="comment">' As <a href="#vbct">vbext_ControlType</a> - Returns the type of the control.</span>
+    <span class="identifier">.InSelection         </span><span class="comment">' As Boolean - Returns True if the control is selected.</span>
+    <span class="identifier">.ProgId              </span><span class="comment">' As String - Returns the ProgID of the control.</span>
+    <span class="identifier">.Properties          </span><span class="comment">' As <a href="#props">Properties</a> - Represents the properties of the object.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.ZOrder() </span><span class="comment">' As VBControl - Places a specified object at the front or back _
+                               of the z-order within its graphical level.</span>
+<span class="keyword">End With</span>
+<a name="vbct">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_ControlType</span>
+  <span class="event">vbext_ct_Container</span>
+  <span class="event">vbext_ct_Light</span>
+  <span class="event">vbext_ct_Standard</span>
+<span class="keyword">End Enum</span>
+<a name="props">&#160;</a>
+<span class="comment">'With .VBProjects(0).VBComponents(0).Properties ' As Properties</span>
+<span class="comment">'With .SelectedVBComponent.Properties ' As Properties</span>
+
+<span class="keyword">With </span><span class="identifier">.SelectedVBComponent.Designer.VBControls(0).Properties </span><span class="comment">' As Properties</span>
+    <span class="identifier">.Count  </span><span class="comment">' As Long - Returns the number of items in the collection.</span>
+    <span class="identifier">.Parent </span><span class="comment">' As Object - Returns the parent object or collection.</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Item() </span><span class="comment">' As <a href="#prop">Property</a> - Returns the indexed item from the collection, _
+                     where index is the name or index number of the item.</span>
+<span class="keyword">End With</span>
+<a name="prop">&#160;</a>
+<span class="comment">'With .VBProjects(0).VBComponents(0).Designer.VBControls(0).Properties(0) ' As Property</span>
+
+<span class="comment">' Represents a property of an object.</span>
+<span class="keyword">With </span><span class="identifier">.VBProjects(0).VBComponents(0).Properties(0) </span><span class="comment">' As Property</span>
+    <span class="identifier">.Collection   </span><span class="comment">' As <a href="#props">Properties</a> - Returns the collection that contains the object.</span>
+    <span class="identifier">.IndexedValue </span><span class="comment">' Returns or sets a value that requires an index.</span>
+    <span class="identifier">.Name         </span><span class="comment">' As String - Returns the name used in code to identify the object.</span>
+    <span class="identifier">.NumIndices   </span><span class="comment">' As Integer - Returns the number of indices on the property.</span>
+    <span class="identifier">.Object       </span><span class="comment">' As Unknown - Returns or sets the object returned by the property.</span>
+    <span class="identifier">.Value        </span><span class="comment">' As Variant - (default member) Returns or sets the value of an object.</span>
+<span class="keyword">End With</span>
+<a name="cbs">&#160;</a>
+<span class="comment">' A collection of CommandBar objects that represent the command bars in the IDE.</span>
+<span class="keyword">With </span><span class="identifier">.CommandBars </span><span class="comment">' As CommandBars</span>
+    <span class="identifier">.ActionControl         </span><span class="comment">' As <a href="#cbarc">CommandBarControl</a> - Returns the CommandBarControl object whose _
+                                             OnAction property is set to the running procedure. </span>
+    <span class="identifier">.ActiveMenuBar         </span><span class="comment">' As <a href="#cmdb">CommandBar</a> - Returns the object that represents the active menu bar.</span>
+    <span class="identifier">.Application           </span><span class="comment">' As Object</span>
+    <span class="identifier">.Count                 </span><span class="comment">' As Long</span>
+    <span class="identifier">.Creator               </span><span class="comment">' As Long</span>
+    <span class="identifier">.DisplayKeysInTooltips </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.DisplayTooltips       </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.LargeButtons          </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.MenuAnimationStyle    </span><span class="comment">' As <a href="#oma">MsoMenuAnimation</a></span>
+    <span class="identifier">.Parent                </span><span class="comment">' As Object</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Add()          </span><span class="comment">' As CommandBar</span>
+    <span class="identifier">.Item()         </span><span class="comment">' As <a href="#cmdb">CommandBar</a> - (default member) index is the name or index number of the item.</span>
+    <span class="identifier">.FindControl()  </span><span class="comment">' As <a href="#cbarc">CommandBarControl</a></span>
+    <span class="identifier">.ReleaseFocus() </span><span class="comment">' Releases the user interface focus from all command bars.</span>
+<span class="keyword">End With</span>
+
+<span class="comment">' Note: You can use the name or index number to specify a menu bar or toolbar
+' in the list of available menu bars and toolbars in the development environment.
+' However, you must use the name to specify a menu, submenu, or context menu.</span>
+<a name="oma">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoMenuAnimation</span>
+  <span class="event">msoMenuAnimationNone</span>
+  <span class="event">msoMenuAnimationRandom</span>
+  <span class="event">msoMenuAnimationSlide</span>
+  <span class="event">msoMenuAnimationUnfold</span>
+<span class="keyword">End Enum</span>
+<a name="cmdb">&#160;</a>
+<span class="comment">'With .CommandBars(0) ' As CommandBar</span>
+
+<span class="keyword">With </span><span class="identifier">.CommandBars.ActiveMenuBar </span><span class="comment">' As CommandBar</span>
+    <span class="identifier">.Application </span><span class="comment">' As Object</span>
+    <span class="identifier">.BuiltIn     </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Context     </span><span class="comment">' As String</span>
+    <span class="identifier">.Controls    </span><span class="comment">' As <a href="#cbcs">CommandBarControls</a></span>
+    <span class="identifier">.Creator     </span><span class="comment">' As Long</span>
+    <span class="identifier">.Enabled     </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Height      </span><span class="comment">' As Long</span>
+    <span class="identifier">.Index       </span><span class="comment">' As Long</span>
+    <span class="identifier">.Left        </span><span class="comment">' As Long</span>
+    <span class="identifier">.Name        </span><span class="comment">' As String</span>
+    <span class="identifier">.NameLocal   </span><span class="comment">' As String</span>
+    <span class="identifier">.Parent      </span><span class="comment">' As Object</span>
+    <span class="identifier">.Position    </span><span class="comment">' As <a href="#obpos">MsoBarPosition</a></span>
+    <span class="identifier">.Protection  </span><span class="comment">' As <a href="#obpr">MsoBarProtection</a></span>
+    <span class="identifier">.RowIndex    </span><span class="comment">' As Long</span>
+    <span class="identifier">.Top         </span><span class="comment">' As Long</span>
+    <span class="identifier">.Type        </span><span class="comment">' As <a href="#obty">MsoBarType</a></span>
+    <span class="identifier">.Visible     </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Width       </span><span class="comment">' As Long</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Delete()      </span><span class="comment">' </span>
+    <span class="identifier">.FindControl() </span><span class="comment">' As <a href="#cbarc">CommandBarControl</a></span>
+    <span class="identifier">.Reset()       </span><span class="comment">' Reset the menu to its default appearance</span>
+    <span class="identifier">.ShowPopup()   </span><span class="comment">' </span>
+<span class="keyword">End With</span>
+<a name="obpos">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoBarPosition</span>
+  <span class="event">msoBarBottom </span><span class="comment">' Indicates where the command bar appears on the screen.</span>
+  <span class="event">msoBarLeft</span>
+  <span class="event">msoBarRight</span>
+  <span class="event">msoBarTop</span>
+  <span class="comment">'</span>
+  <span class="event">msoBarFloating </span><span class="comment">' Indicates that the command bar isn't docked.</span>
+  <span class="event">msoBarMenuBar  </span><span class="comment">' Indicates that the command bar is a Macintosh® only system menu bar. This constant _
+                   is incorrectly listed as msoBarMenu in the Help topic for the Position property.</span>
+  <span class="event">msoBarPopup    </span><span class="comment">' Read-only. Indicates that the command bar is a shortcut context menu.</span>
+<span class="keyword">End Enum</span>
+<a name="obpr">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoBarProtection</span>
+  <span class="event">msoBarNoChangeDock</span>
+  <span class="event">msoBarNoChangeVisible</span>
+  <span class="event">msoBarNoCustomize</span>
+  <span class="event">msoBarNoHorizontalDock</span>
+  <span class="event">msoBarNoMove</span>
+  <span class="event">msoBarNoProtection</span>
+  <span class="event">msoBarNoResize</span>
+  <span class="event">msoBarNoVerticalDock</span>
+<span class="keyword">End Enum</span>
+<a name="obty">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoBarType</span>
+  <span class="event">msoBarTypeMenuBar </span><span class="comment">' Used for creating custom menu bars.</span>
+  <span class="event">msoBarTypeNormal  </span><span class="comment">' The familiar toolbar command bar.</span>
+  <span class="event">msoBarTypePopup   </span><span class="comment">' Context menus, displayed by right-clicking.</span>
+<span class="keyword">End Enum</span>
+
+<span class="comment">' Print all the context menus in the Immediate window</span>
+<span class="keyword">Dim </span><span class="identifier">CBar </span><span class="keyword">As </span><span class="identifier">CommandBar</span>
+<span class="keyword">For Each </span><span class="identifier">CBar </span><span class="keyword">In </span><span class="identifier">.CommandBars</span>
+    <span class="keyword">If </span><span class="identifier">CBar.Type</span> <span class="text">= </span><span class="event">msoBarTypePopup </span><span class="keyword">Then</span>
+        <span class="keyword">Debug.Print </span><span class="identifier">CBar.Name</span>
+    <span class="keyword">End If</span>
+<span class="keyword">Next</span>
+
+<span class="comment">' Create a context menu using the Position argument</span>
+<span class="keyword">Dim </span><span class="identifier">mymenubar </span><span class="keyword">As </span><span class="identifier">CommandBar</span>
+<span class="keyword">Set </span><span class="identifier">mymenubar </span><span class="text">= </span><span class="identifier">CommandBars.Add(Name</span><span class="text">:="MyPopup", </span><span class="identifier">Position</span><span class="text">:=</span><span class="event">msoBarPopup</span><span class="text">)</span>
+
+<span class="comment">' Note: You can use the Add method to create a context menu, but you can't change</span>
+<span class="comment">' an existing command bar of another type to a context menu. Although the Position</span>
+<span class="comment">' property for command bars has an msoBarPopup setting, this setting is read-only;</span>
+<span class="comment">' it is used to determine whether an existing command bar is a pop-up menu.</span>
+<span class="comment">' You can't set this property to change the type of a command bar to msoBarPopup.</span>
+
+<span class="text">View <A HREF="MoreInfo/MoreMSDN/AddCommandBars.htm">AddCommandBars.htm</A> (Use back button)</span>
+<a name="cbcs">&#160;</a>
+<span class="keyword">With </span><span class="identifier">.CommandBars(0).Controls </span><span class="comment">' As CommandBarControls</span>
+    <span class="identifier">.Application </span><span class="comment">' As Object</span>
+    <span class="identifier">.Count       </span><span class="comment">' As Long</span>
+    <span class="identifier">.Creator     </span><span class="comment">' As Long</span>
+    <span class="identifier">.Parent      </span><span class="comment">' As <a href="#cmdb">CommandBar</a></span>
+    <span class="comment">'</span>
+    <span class="identifier">.Add()  </span><span class="comment">' As <a href="#cbarc">CommandBarControl</a></span>
+    <span class="identifier">.Item() </span><span class="comment">' As CommandBarControl - (default member) index is the name or index number of the item.</span>
+<span class="keyword">End With</span>
+<a name="cbarc">&#160;</a>
+<span class="comment">'With .CommandBars(0).Controls(0) ' As CommandBarControl</span>
+
+<span class="keyword">With </span><span class="identifier">.CommandBars.ActionControl </span><span class="comment">' As CommandBarControl</span>
+    <span class="identifier">.Application     </span><span class="comment">' As Object</span>
+    <span class="identifier">.BeginGroup      </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.BuiltIn         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Caption         </span><span class="comment">' As String</span>
+    <span class="identifier">.Creator         </span><span class="comment">' As Long</span>
+    <span class="identifier">.DescriptionText </span><span class="comment">' As String</span>
+    <span class="identifier">.Enabled         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Height          </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpContextID   </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpFile        </span><span class="comment">' As String</span>
+    <span class="identifier">.Id              </span><span class="comment">' As Long</span>
+    <span class="identifier">.Index           </span><span class="comment">' As Long</span>
+    <span class="identifier">.Left            </span><span class="comment">' As Long</span>
+    <span class="identifier">.OLEUsage        </span><span class="comment">' As <a href="#ocou">MsoControlOLEUsage</a></span>
+    <span class="identifier">.OnAction        </span><span class="comment">' As String</span>
+    <span class="identifier">.Parameter       </span><span class="comment">' As String</span>
+    <span class="identifier">.Parent          </span><span class="comment">' As <a href="#cmdb">CommandBar</a></span>
+    <span class="identifier">.Priority        </span><span class="comment">' As Long</span>
+    <span class="identifier">.Tag             </span><span class="comment">' As String</span>
+    <span class="identifier">.ToolTipText     </span><span class="comment">' As String</span>
+    <span class="identifier">.Top             </span><span class="comment">' As Long</span>
+    <span class="identifier">.Type            </span><span class="comment">' As <a href="#octy">MsoControlType</a></span>
+    <span class="identifier">.Visible         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Width           </span><span class="comment">' As Long</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Copy()     </span><span class="comment">' As CommandBarControl</span>
+    <span class="identifier">.Delete()   </span><span class="comment">' </span>
+    <span class="identifier">.Execute()  </span><span class="comment">' </span>
+    <span class="identifier">.Move()     </span><span class="comment">' As CommandBarControl</span>
+    <span class="identifier">.Reset()    </span><span class="comment">' </span>
+    <span class="identifier">.SetFocus() </span><span class="comment">' </span>
+<span class="keyword">End With</span>
+<a name="ocou">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoControlOLEUsage</span>
+  <span class="event">msoControlOLEUsageBoth</span>
+  <span class="event">msoControlOLEUsageClient</span>
+  <span class="event">msoControlOLEUsageNeither</span>
+  <span class="event">msoControlOLEUsageServer</span>
+<span class="keyword">End Enum</span>
+<a name="octy">&#160;</a>
+<span class="comment">' There are three types of command bars:</span>
+<span class="keyword">Office.</span><span class="text">MsoControlType</span>
+  <span class="comment">' A Popup command bar is equivalent to a menu item on a menu bar.</span>
+  <span class="event"><a href="#cbpop">msoControlPopup</a></span>
+  <span class="event">msoControlButtonPopup</span>
+  <span class="event">msoControlGraphicPopup</span>
+  <span class="event">msoControlSplitButtonMRUPopup</span>
+  <span class="event">msoControlSplitButtonPopup</span>
+  <span class="comment">' A ComboBox command bar is similar to a ComboBox control. That is, a toolbar</span>
+  <span class="comment">' button with a dropdown arrow next to it (like the Add Project toolbar button).</span>
+  <span class="comment">' When you click the arrow, it displays more menu commands with icons.</span>
+  <span class="event"><a href="#cbcbo">msoControlComboBox</a></span> 
+  <span class="event">msoControlButtonDropdown</span>
+  <span class="event">msoControlDropdown</span>
+  <span class="event">msoControlEdit</span>
+  <span class="event">msoControlGraphicCombo</span>
+  <span class="event">msoControlGraphicDropdown</span>
+  <span class="event">msoControlOCXDropdown</span>
+  <span class="event">msoControlSplitDropdown</span>
+  <span class="comment">' A Button command bar is equivalent to a standard toolbar button.</span>
+  <span class="comment">' That is, a button with an icon displayed on it.</span>
+  <span class="event"><a href="#cbbut">msoControlButton</a></span>   
+  <span class="comment">'</span>
+  <span class="event">msoControlCustom</span>
+  <span class="event">msoControlExpandingGrid</span>
+  <span class="event">msoControlGauge</span>
+  <span class="event">msoControlGenericDropdown</span>
+  <span class="event">msoControlGrid</span>
+  <span class="event">msoControlLabel</span>
+  <span class="event">msoControlSplitExpandingGrid</span>
+<span class="keyword">End Enum</span>
+
+<span class="text">View <A HREF="MoreInfo/MoreMSDN/TypeProp.htm">TypeProp.htm</A> (Use back button)</span>
+<a name="cbpop">&#160;</a>
+<span class="comment">' CommandBarPopup</span>
+<span class="comment">' The Type property of the CommandBarControl is msoControlPopup, msoControlGraphicPopup,</span>
+<span class="comment">' msoControlButtonPopup, msoControlSplitButtonPopup, or msoControlSplitButtonMRUPopup.</span>
+
+<span class="comment">' A Popup command bar is equivalent to a menu item on a menu bar.</span>
+<span class="keyword">With </span><span class="identifier">.CommandBars(0).Controls(0) </span><span class="comment">' As CommandBarPopup</span>
+    <span class="identifier">.Application     </span><span class="comment">' As Object</span>
+    <span class="identifier">.BeginGroup      </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.BuiltIn         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Caption         </span><span class="comment">' As String</span>
+    <span class="identifier">.CommandBar      </span><span class="comment">' As <a href="#cmdb">CommandBar</a></span>
+    <span class="identifier">.Controls        </span><span class="comment">' As <a href="#cbcs">CommandBarControls</a></span>
+    <span class="identifier">.Creator         </span><span class="comment">' As Long</span>
+    <span class="identifier">.DescriptionText </span><span class="comment">' As String</span>
+    <span class="identifier">.Enabled         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Height          </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpContextID   </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpFile        </span><span class="comment">' As String</span>
+    <span class="identifier">.Id              </span><span class="comment">' As Long</span>
+    <span class="identifier">.Index           </span><span class="comment">' As Long</span>
+    <span class="identifier">.Left            </span><span class="comment">' As Long</span>
+    <span class="identifier">.OLEMenuGroup    </span><span class="comment">' As <a href="#oomg">MsoOLEMenuGroup</a></span>
+    <span class="identifier">.OLEUsage        </span><span class="comment">' As <a href="#ocou">MsoControlOLEUsage</a></span>
+    <span class="identifier">.OnAction        </span><span class="comment">' As String</span>
+    <span class="identifier">.Parameter       </span><span class="comment">' As String</span>
+    <span class="identifier">.Parent          </span><span class="comment">' As CommandBar</span>
+    <span class="identifier">.Priority        </span><span class="comment">' As Long</span>
+    <span class="identifier">.Tag             </span><span class="comment">' As String</span>
+    <span class="identifier">.ToolTipText     </span><span class="comment">' As String</span>
+    <span class="identifier">.Top             </span><span class="comment">' As Long</span>
+    <span class="identifier">.Type            </span><span class="comment">' As <a href="#octy">MsoControlType</a></span>
+    <span class="identifier">.Visible         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Width           </span><span class="comment">' As Long</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Copy()      </span><span class="comment">' As <a href="#cbarc">CommandBarControl</a></span>
+    <span class="identifier">.Delete()    </span><span class="comment">' </span>
+    <span class="identifier">.Execute()   </span><span class="comment">' </span>
+    <span class="identifier">.Move()      </span><span class="comment">' As CommandBarControl</span>
+    <span class="identifier">.Reset()     </span><span class="comment">' </span>
+    <span class="identifier">.SetFocus()  </span><span class="comment">' </span>
+<span class="keyword">End With</span>
+<a name="oomg">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoOLEMenuGroup</span>
+  <span class="event">msoOLEMenuGroupContainer</span>
+  <span class="event">msoOLEMenuGroupEdit</span>
+  <span class="event">msoOLEMenuGroupFile</span>
+  <span class="event">msoOLEMenuGroupHelp</span>
+  <span class="event">msoOLEMenuGroupNone</span>
+  <span class="event">msoOLEMenuGroupObject</span>
+  <span class="event">msoOLEMenuGroupWindow</span>
+<span class="keyword">End Enum</span>
+<a name="cbcbo">&#160;</a>
+<span class="comment">' CommandBarComboBox</span>
+<span class="comment">' The Type property of the CommandBarControl is msoControlEdit, msoControlDropdown,</span>
+<span class="comment">' msoControlComboBox, msoControlButtonDropdown, msoControlSplitDropdown,</span>
+<span class="comment">' msoControlOCXDropdown, msoControlGraphicCombo, or msoControlGraphicDropdown.</span>
+
+<span class="comment">' A ComboBox command bar is similar to a ComboBox control. That is, a toolbar</span>
+<span class="comment">' button with a dropdown arrow next to it (like the Add Project toolbar button).</span>
+<span class="comment">' When you click the arrow, it displays more menu commands with icons.</span>
+<span class="keyword">With </span><span class="identifier">.CommandBars(0).Controls(0) </span><span class="comment">' As CommandBarComboBox</span>
+    <span class="identifier">.Application     </span><span class="comment">' As Object</span>
+    <span class="identifier">.BeginGroup      </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.BuiltIn         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Caption         </span><span class="comment">' As String</span>
+    <span class="identifier">.Creator         </span><span class="comment">' As Long</span>
+    <span class="identifier">.DescriptionText </span><span class="comment">' As String</span>
+    <span class="identifier">.DropDownLines   </span><span class="comment">' As Long</span>
+    <span class="identifier">.DropDownWidth   </span><span class="comment">' As Long</span>
+    <span class="identifier">.Enabled         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Height          </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpContextID   </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpFile        </span><span class="comment">' As String</span>
+    <span class="identifier">.Id              </span><span class="comment">' As Long</span>
+    <span class="identifier">.Index           </span><span class="comment">' As Long</span>
+    <span class="identifier">.Left            </span><span class="comment">' As Long</span>
+    <span class="identifier">.List()          </span><span class="comment">' As String</span>
+    <span class="identifier">.ListCount       </span><span class="comment">' As Long</span>
+    <span class="identifier">.ListHeaderCount </span><span class="comment">' As Long</span>
+    <span class="identifier">.ListIndex       </span><span class="comment">' As Long</span>
+    <span class="identifier">.OLEUsage        </span><span class="comment">' As <a href="#ocou">MsoControlOLEUsage</a></span>
+    <span class="identifier">.OnAction        </span><span class="comment">' As String</span>
+    <span class="identifier">.Parameter       </span><span class="comment">' As String</span>
+    <span class="identifier">.Parent          </span><span class="comment">' As <a href="#cmdb">CommandBar</a></span>
+    <span class="identifier">.Priority        </span><span class="comment">' As Long</span>
+    <span class="identifier">.Style           </span><span class="comment">' As <a href="#ocst">MsoComboStyle</a></span>
+    <span class="identifier">.Tag             </span><span class="comment">' As String</span>
+    <span class="identifier">.Text            </span><span class="comment">' As String</span>
+    <span class="identifier">.ToolTipText     </span><span class="comment">' As String</span>
+    <span class="identifier">.Top             </span><span class="comment">' As Long</span>
+    <span class="identifier">.Type            </span><span class="comment">' As <a href="#octy">MsoControlType</a></span>
+    <span class="identifier">.Visible         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Width           </span><span class="comment">' As Long</span>
+    <span class="comment">'</span>
+    <span class="identifier">.AddItem()    </span><span class="comment">'</span>
+    <span class="identifier">.Clear()      </span><span class="comment">'</span>
+    <span class="identifier">.Copy()       </span><span class="comment">' As <a href="#cbarc">CommandBarControl</a></span>
+    <span class="identifier">.Delete()     </span><span class="comment">' </span>
+    <span class="identifier">.Execute()    </span><span class="comment">' </span>
+    <span class="identifier">.Move()       </span><span class="comment">' As CommandBarControl</span>
+    <span class="identifier">.RemoveItem() </span><span class="comment">'</span>
+    <span class="identifier">.Reset()      </span><span class="comment">' </span>
+    <span class="identifier">.SetFocus()   </span><span class="comment">' </span>
+<span class="keyword">End With</span>
+<a name="ocst">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoComboStyle</span>
+  <span class="event">msoComboLabel</span>
+  <span class="event">msoComboNormal</span>
+<span class="keyword">End Enum</span>
+<a name="cbbut">&#160;</a>
+<span class="comment">' CommandBarButton</span>
+<span class="comment">' The Type property of the CommandBarControl is msoControlButton.</span>
+
+<span class="comment">' A Button command bar is equivalent to a standard toolbar button.</span>
+<span class="comment">' That is, a button with an icon displayed on it.</span>
+<span class="keyword">With </span><span class="identifier">.CommandBars(0).Controls(0) </span><span class="comment">' As CommandBarButton</span>
+    <span class="identifier">.Application     </span><span class="comment">' As Object</span>
+    <span class="identifier">.BeginGroup      </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.BuiltIn         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.BuiltInFace     </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Caption         </span><span class="comment">' As String</span>
+    <span class="identifier">.Creator         </span><span class="comment">' As Long</span>
+    <span class="identifier">.DescriptionText </span><span class="comment">' As String</span>
+    <span class="identifier">.Enabled         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.FaceId          </span><span class="comment">' As Long</span>
+    <span class="identifier">.Height          </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpContextID   </span><span class="comment">' As Long</span>
+    <span class="identifier">.HelpFile        </span><span class="comment">' As String</span>
+    <span class="identifier">.Id              </span><span class="comment">' As Long</span>
+    <span class="identifier">.Index           </span><span class="comment">' As Long</span>
+    <span class="identifier">.Left            </span><span class="comment">' As Long</span>
+    <span class="identifier">.OLEUsage        </span><span class="comment">' As <a href="#ocou">MsoControlOLEUsage</a></span>
+    <span class="identifier">.OnAction        </span><span class="comment">' As String</span>
+    <span class="identifier">.Parameter       </span><span class="comment">' As String</span>
+    <span class="identifier">.Parent          </span><span class="comment">' As <a href="#cmdb">CommandBar</a></span>
+    <span class="identifier">.Priority        </span><span class="comment">' As Long</span>
+    <span class="identifier">.ShortcutText    </span><span class="comment">' As String</span>
+    <span class="identifier">.State           </span><span class="comment">' As <a href="#obst">MsoButtonState</a></span>
+    <span class="identifier">.Style           </span><span class="comment">' As <a href="#obsl">MsoButtonStyle</a></span>
+    <span class="identifier">.Tag             </span><span class="comment">' As String</span>
+    <span class="identifier">.ToolTipText     </span><span class="comment">' As String</span>
+    <span class="identifier">.Top             </span><span class="comment">' As Long</span>
+    <span class="identifier">.Type            </span><span class="comment">' As <a href="#octy">MsoControlType</a></span>
+    <span class="identifier">.Visible         </span><span class="comment">' As Boolean</span>
+    <span class="identifier">.Width           </span><span class="comment">' As Long</span>
+    <span class="comment">'</span>
+    <span class="identifier">.Copy()      </span><span class="comment">' As <a href="#cbarc">CommandBarControl</a></span>
+    <span class="identifier">.CopyFace()  </span><span class="comment">'</span>
+    <span class="identifier">.Delete()    </span><span class="comment">' </span>
+    <span class="identifier">.Execute()   </span><span class="comment">' </span>
+    <span class="identifier">.Move()      </span><span class="comment">' As CommandBarControl</span>
+    <span class="identifier">.PasteFace() </span><span class="comment">' </span>
+    <span class="identifier">.Reset()     </span><span class="comment">' </span>
+    <span class="identifier">.SetFocus()  </span><span class="comment">' </span>
+<span class="keyword">End With</span>
+<a name="obst">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoButtonState</span>
+  <span class="event">msoButtonDown</span>
+  <span class="event">msoButtonMixed</span>
+  <span class="event">msoButtonUp</span>
+<span class="keyword">End Enum</span>
+<a name="obsl">&#160;</a>
+<span class="keyword">Office.</span><span class="text">MsoButtonStyle</span>
+  <span class="event">msoButtonAutomatic</span>
+  <span class="event">msoButtonCaption</span>
+  <span class="event">msoButtonIcon</span>
+  <span class="event">msoButtonIconAndCaption</span>
+<span class="keyword">End Enum</span>
+<a name="vbam">&#160;</a>
+<span class="keyword">VBIDE.</span><span class="text">vbext_VBAMode</span>
+  <span class="event">vbext_vm_Break  </span><span class="comment">' The project is in break mode.</span>
+  <span class="event">vbext_vm_Design </span><span class="comment">' The project is in design mode.</span>
+  <span class="event">vbext_vm_Run    </span><span class="comment">' The project is in run mode.</span>
+<span class="keyword">End Enum</span>
+<a name="evs">&#160;</a>
+<span class="comment">' Supplies properties that enable add-ins to connect to all events in VBA. The</span>
+<span class="comment">' properties of the Events object return objects of the same type as the property</span>
+<span class="comment">' name. E.G, the CommandBarEvents property returns the CommandBarEvents object.</span>
+<span class="keyword">With </span><span class="identifier">.Events </span><span class="comment">' As Events</span>
+    <span class="identifier">.CommandBarEvents   </span><span class="comment">' As <a href="#cmdbe">CommandBarEvents</a> - Returns the CommandBar Events object.</span>
+    <span class="identifier">.FileControlEvents  </span><span class="comment">' As <a href="#fctle">FileControlEvents</a> - Returns the FileControl Events object.</span>
+    <span class="identifier">.ReferencesEvents   </span><span class="comment">' As <a href="#refe">ReferencesEvents</a> - Returns the References Events object.</span>
+    <span class="identifier">.SelectedVBControlsEvents </span><span class="comment">' As <a href="#svbce">SelectedVBControlsEvents</a> - Returns the Selected _
+                                                            Controls Events object.</span>
+    <span class="identifier">.VBComponentsEvents </span><span class="comment">' As <a href="#vbcpe">VBComponentsEvents</a> - Returns the Components Events object.</span>
+    <span class="identifier">.VBControlsEvents   </span><span class="comment">' As <a href="#vbce">VBControlsEvents</a> - Returns the Controls Events object.</span>
+    <span class="identifier">.VBProjectsEvents   </span><span class="comment">' As <a href="#vbpe">VBProjectsEvents</a> - Returns the Projects Events object.</span>
+<span class="keyword">End With</span>
+<a name="cmdbe">&#160;</a>
+ <span class="text">CommandBarEvents</span>
+  <span class="event">Click     </span><span class="comment">' Occurs when the corresponding command bar control is clicked.</span>
+<a name="fctle">&#160;</a>
+ <span class="text">FileControlEvents</span>
+  <span class="event">AfterAddFile          </span><span class="comment">' Occurs after a form, class, module or other file type has been added to the current project.</span>
+  <span class="event">AfterChangeFileName   </span><span class="comment">' Occurs after a file in the current project has been renamed and saved or when an .exe is created.</span>
+  <span class="event">AfterCloseFile        </span><span class="comment">' Occurs after a project has been closed, either directly by the user the user quits Visual Basic.</span>
+  <span class="event">AfterRemoveFile       </span><span class="comment">' Occurs after a file is removed from the active Visual Basic project.</span>
+  <span class="event">AfterWriteFile        </span><span class="comment">' Occurs after a file is written to disk.</span>
+  <span class="event">BeforeLoadFile        </span><span class="comment">' Occurs before a file or component is loaded into the active Visual Basic project.</span>
+  <span class="event">DoGetNewFileName      </span><span class="comment">' Occurs when a user chooses the Save Project or Save Form command from the File menu _
+                          for a new file, chooses the Save Project As or Save Form As command from the File menu _
+                          for an existing file, or chooses the Make File Name command from the File menu.</span>
+  <span class="event">RequestChangeFileName </span><span class="comment">' Occurs after specifying a new file name for a component.</span>
+  <span class="event">RequestWriteFile      </span><span class="comment">' Occurs prior to saving any project component with unsaved changes.</span>
+
+  <span class="keyword">VBIDE.</span><span class="text">vbext_FileType</span> <span class="comment">' FileType argument for all FileControlEvents except RequestWriteFile and BeforeLoadFile.</span>
+    <span class="event">vbext_ft_Binary</span>
+    <span class="event">vbext_ft_Class</span>
+    <span class="event">vbext_ft_Designers</span>
+    <span class="event">vbext_ft_DocObject</span>
+    <span class="event">vbext_ft_Exe</span>
+    <span class="event">vbext_ft_Form</span>
+    <span class="event">vbext_ft_Frx</span>
+    <span class="event">vbext_ft_GroupProject</span>
+    <span class="event">vbext_ft_Module</span>
+    <span class="event">vbext_ft_Project</span>
+    <span class="event">vbext_ft_PropertyPage</span>
+    <span class="event">vbext_ft_Res</span>
+    <span class="event">vbext_ft_UserControl</span>
+  <span class="keyword">End Enum</span>
+<a name="refe">&#160;</a>
+ <span class="text">ReferencesEvents</span>
+  <span class="event">ItemAdded     </span><span class="comment">' Occurs after a Reference has been added to a project.</span>
+  <span class="event">ItemRemoved   </span><span class="comment">' Occurs after a Reference has been removed from a project.</span>
+<a name="svbce">&#160;</a>
+ <span class="text">SelectedVBControlsEvents</span>
+  <span class="event">ItemAdded     </span><span class="comment">' Occurs after a VBControl is added.</span>
+  <span class="event">ItemRemoved   </span><span class="comment">' Occurs after a VBControl is removed.</span>
+<a name="vbcpe">&#160;</a>
+ <span class="text">VBComponentsEvents</span>
+  <span class="event">ItemActivated </span><span class="comment">' Occurs after a VBComponent is activated.</span>
+  <span class="event">ItemAdded     </span><span class="comment">' Occurs after a VBComponent is added.</span>
+  <span class="event">ItemReloaded  </span><span class="comment">' Occurs after a VBComponent is reloaded</span>
+  <span class="event">ItemRemoved   </span><span class="comment">' Occurs after a VBComponent is removed.</span>
+  <span class="event">ItemRenamed   </span><span class="comment">' Occurs after a VBComponent renamed.</span>
+  <span class="event">ItemSelected  </span><span class="comment">' Occurs after a VBComponent is selected.</span>
+<a name="vbce">&#160;</a>
+ <span class="text">VBControlsEvents</span>
+  <span class="event">ItemAdded     </span><span class="comment">' Occurs after a VBControl is added.</span>
+  <span class="event">ItemRemoved   </span><span class="comment">' Occurs after a VBControl is removed.</span>
+  <span class="event">ItemRenamed   </span><span class="comment">' Occurs after a VBControl is renamed.</span>
+<a name="vbpe">&#160;</a>
+ <span class="text">VBProjectsEvents</span>
+  <span class="event">ItemActivated </span><span class="comment">' Occurs after a VBProject is activated.</span>
+  <span class="event">ItemAdded     </span><span class="comment">' Occurs after a VBProject is added.</span>
+  <span class="event">ItemRemoved   </span><span class="comment">' Occurs after a VBProject is removed.</span>
+  <span class="event">ItemRenamed   </span><span class="comment">' Occurs after a VBProject is renamed.</span>
+<a name="aie">&#160;</a>
+ <span class="comment">' Events raised by the Microsoft Add-In Designer</span>
+ <span class="text">AddInDesignerObjects.AddinInstance</span>
+  <span class="event">OnAddInsUpdate</span>
+  <span class="event">OnBeginShutdown</span>
+  <span class="event">OnConnection</span>
+  <span class="event">OnDisconnection</span>
+  <span class="event">OnStartupComplete</span> 
+<a name="conm">&#160;</a>
+ <span class="keyword">Select Case </span><span class="identifier">ConnectMode</span> </span><span class="comment">' As AddInDesignerObjects.ext_ConnectMode</span>
+    <span class="keyword">Case </span><span class="event">ext_cm_External</span>
+      <span class="comment">' Add-in is connected externally.</span>
+      <span class="comment">' Used by the add-in toolbar to start this add-in.</span>
+    <span class="keyword">Case </span><span class="event">ext_cm_Startup</span>
+      <span class="comment">' Add-in is connected on IDE startup.</span>
+    <span class="keyword">Case </span><span class="event">ext_cm_AfterStartup</span>
+      <span class="comment">' Add-in is connected after IDE startup.</span>
+    <span class="keyword">Case </span><span class="event">ext_cm_CommandLine</span>
+      <span class="comment">' Add-in loads only when specifically invoked from a command-line parameter.</span>
+ <span class="keyword">End Select</span>
+<a name="remm">&#160;</a>
+ <span class="keyword">Select Case </span><span class="identifier">RemoveMode</span> <span class="comment">' As AddInDesignerObjects.ext_DisconnectMode</span>
+    <span class="keyword">Case </span><span class="event">ext_dm_HostShutdown</span>
+      <span class="comment">' Add-in is disconnected when the host shuts down.</span>
+    <span class="keyword">Case </span><span class="event">ext_dm_UserClosed</span>
+      <span class="comment">' Add-in is disconnected by the user.</span>
+ <span class="keyword">End Select</span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </pre>
+</body></html>

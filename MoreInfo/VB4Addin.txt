@@ -1,0 +1,371 @@
+
+Object References
+
+Objects contained within the Visual Basic IDE can be manipulated
+from within an add–in using object variables.
+
+These are variables of the data type "object" — a collective term
+describing OLE objects in general.
+
+Using this "implicit object reference" approach, developers would
+create variables of general object types, also referred to as "late
+binding". This is illustrated in the following example:
+
+Dim ThisProject As Object
+Dim ThisForm As Object
+
+Set ThisProject = VBInstance.ActiveProject
+Set ThisForm = ThisProject.ActiveForm
+
+Developers also can create a variable of the specific type of object
+they intend to use.
+
+This "explicit object reference" approach, also called "late binding",
+provides a much more efficient method of referencing objects, because
+under this method the compiler does not need to resolve the object
+type before using it.
+
+Variables of specific object types would be created as shown:
+
+Dim ThisProject As ProjectTemplate
+Dim ThisForm As FormTemplate 
+
+Set ThisProject = VBInstance.ActiveProject
+Set ThisForm = ThisProject.ActiveForm
+
+To handle the case in which identically named collections or members
+reside in different object libraries, developers can preface the object
+reference with the name of the library in which the object reference
+resides.
+
+For example, an object named Properties is used in the Visual Basic
+IDE and in the DAO libraries.
+
+The following code segment illustrates how to resolve this conflict:
+
+Public TheseIDEProperties As VBIDE.Properties
+Public TheseDAOProperties As DAO.Properties
+
+=============================================================
+
+In my Visual Basic code, I give objects nicknames to reduce complexities.
+
+To illustrate the difference between using nicknames and not doing so,
+consider the following lines of code:
+
+' Example of a pedigreed object.
+A$ = ThisInstance.ActiveProject.ActiveForm.SelectedControlTemplates(i%).Properties(j%).Name
+
+' Example of creating a nicknamed object.
+Dim ThisProperty As VBIDE.Property
+Set ThisProperty = 
+ThisInstance.ActiveProject.ActiveForm.SelectedControlTemplates(i%).Properties(j%)
+
+' Example of a nicknamed object
+A$ = ThisProperty.Name
+
+=============================================================
+
+When the VBIDE object creates an instance of the add-in, this
+instance may create many other instances as side effects.
+
+This may seem a bit excessive. Unfortunately, an add-in needs
+this structure because the add-in may be used concurrently by
+many VBIDE instances.
+
+The class module should have the Instancing property set to Creatable
+MultiUse. Using the Creatable MultiUse setting with multiple clients
+may require some reflection and may change your programming style.
+
+Thinking about the Instancing property has led me to suggest that you
+follow these guidelines:
+
+ Global variables are not permitted.
+ Module level variables in non-class (standrd) modules are not permitted.
+ Static variables or procedures in non-class modules are not permitted.
+ The project creates all forms and class modules by using a
+ Dim ... As New ... statement and uses only these new instances.
+
+I leave the explanations to you for your enrichment and education.
+
+=============================================================
+
+I create the child instances in the Declarations section of each file,
+using Private to enforce a strict hierarchy and to allow multiple
+instances with the same instance name to coexist but in different
+scopes.
+
+The child instances must disappear when the parent terminates. I
+implement this code in my AddIn class module. I create the other
+classes' instances and the frmStatus form instance with the following
+code:
+
+' In Declarations of AddIn.cls
+Private ThisAddInMgr As New clsAddInMgr 'AddInMgr.cls
+Private ThisTipsHelp As New clsTipsHelp 'TipsHelp.cls
+Private ThisForm As New frmStatus
+
+' """"""""
+
+I place the code to create a form instance in each child class
+module under the Declarations section of the class module or form:
+
+' In another class module or form, i.e. AddInMgr.cls
+Private ThisForm As New frmAddInMgr 'AddInMgr.frm
+
+Each time the VBIDE creates an instance of the add-in, the add-in
+instance in turn creates separate private instances of any child
+class or form.
+
+' """"""""
+
+The VBIDE model for menu items is simple: Each menu choice sends a
+click event without arguments to a class instance that has an
+AfterClick method.
+
+The procedure receives no information, except that the AfterClick
+event fired.
+
+I must attach each menu item to a different class instance.
+
+This allows each menu item to fire a different AfterClick event
+in each class module.
+
+Private ThisInstance As VBIDE.Application
+'Private ThisInstance As VBIDE.VBE
+
+' Save a pointer back to the calling VBIDE for this instance
+Set ThisInstance = VBInstance   'Keep a reference.
+
+' Add a submenu to the VBIDE to place other menu items for the add-in
+Set ThisSubMenu = ThisInstance.AddInMenu.MenuItems.AddMenu("&My Addin")
+
+' Add a menu item under our submenu
+Set ThisMenuLine = ThisSubMenu.MenuItems.Add("&Standard Code")
+
+' Direct the AfterClick events to a specific class instance
+hThisMenuLine = ThisMenuLine.ConnectEvents(ThisAddInMgr)
+
+' Pass the pointer to the instance
+ThisAddInMgr.MenuLine = ThisMenuLine
+
+' Pass the pointer to the menu item to the child class instance.
+' The child class instance saves these values and then passes them
+' on to any child class or form instances
+ThisAddInMgr.VBIDE = ThisInstance
+
+The class instance needs to receive a pointer to the instance of the
+VBIDE object and a pointer to the menu item that fires it.
+
+This class passes these items to the child form so that the form may
+manipulate the VBIDE object or the menu item controlling it.
+
+' """"""""
+
+Public Property Let VBIDE(vNewValue)
+    Set ThisInstance = vNewValue 'Keep a reference locally
+    ThisForm.VBIDE = vNewValue   'Pass reference to child
+End Property
+
+At this point you may be a bit confused over another ThisInstance.
+I always use This as a prefix to Private variables and objects and
+My as a prefix to application-scope variables and objects.
+
+With my add-ins, every class and every instance has its own Private
+ThisInstance; the Instancing property's setting of Creatable MultiUse
+prevents the use of MyInstance. 
+
+=============================================================
+
+One problem with doing OLE Automation is time-outs. I prefer to do
+asynchronous automation using a timer. With asynchronous automation,
+the OLE Automation call sets an argument’s value, enables a timer,
+and then returns to the client.
+
+The timer executes the method after the OLE Automation call finishes
+and prevents a time-out.
+
+For example, when an instance creates a form instance, Form_Load would
+fire, but if this event takes a long time to finish, a time-out may
+occur.
+
+Also, the user perceives faster performance because of this quicker
+return.
+
+In my implementation, the Form_Load procedure is always empty. I use
+a DelayedForm_Load procedure and a timer set to an arbitrary 3/10 of
+a second.
+
+To ensure that the instance executes DelayedForm_Load procedure once,
+the Timer1_Timer procedure uses a flag. The timer is also available to
+be used for other purposes.
+
+Private Sub Timer1_Timer()
+    ' Set a flag to prevent multiple execution to occur
+    Static fFormLoad As Long
+    If Not fFormLoad Then
+        Timer1.Enabled = False ' Disable timer and set flag before
+        fFormLoad = True       ' calling DelayedForm_Load, otherwise
+        DelayedForm_Load       ' the timer may fire AGAIN during it.
+    End If
+    ' Other uses of timer may be added here
+End Sub
+
+The add-in does all communications asynchronously, using timers on
+the forms to start code execution after the VBIDE object fires the
+event.
+
+Why do it this way? This implementation avoids using the menu items
+added to the Visual Basic menu bar to execute code.
+
+When menu items execute procedures, executing code cannot be canceled.
+
+This implementation avoids problems with time-outs when the code
+does not complete fast enough.
+
+=============================================================
+
+To illustrate the extraction of information from ThisMenuLine and
+ThisInstance, I changed the caption of each form belonging to my
+add-in so that the user can identify the project attached to the
+form instance. The code is a one-liner:
+
+Private ThisProject As VBIDE.ProjectTemplate
+...
+Set ThisProject = ThisInstance.ActiveProject
+Me.Caption = ThisMenuLine.Caption & " : " & ThisProject.FileName
+
+=============================================================
+
+Adding a file
+
+Although I could blindly copy files from other projects, I would prefer
+to see a menu of files, click the item I want, and have these files added
+to my project.
+
+I create a file containing the code and then add it.
+
+Because most Visual Basic files very rarely exceed the capacity of a
+Visual Basic string, I place the code I obtained into a string and then
+call the procedure below.
+
+The procedure creates the full path from the filename so that this new
+file is in the same directory as the project file, checks for the existence
+of this file, and then adds it to the project.
+
+Public Sub Project_AddFile(ByVal FileCode$, _
+                           ByVal FileName$, _
+                           Project As VBIDE.ActiveProject)
+    Dim FullPath$, FileType$
+
+    FullPath$ = ExtractPath(Project.FileName) + FileName$
+    If Len(Dir$(FullPath$)) > 0 Then
+        MsgBox "File [" + FileName$ + "] Already exists. Please use a different " & _ 
+               "name, or rename or delete the existing file, then try again.", _
+               vbInformation, "File already exists..."
+        Exit Sub
+    End If
+
+    fno% = FreeFile
+    Open FullPath$ For Output As #fno%
+        Print #fno%, FileCode$
+    Close #fno%
+
+    FileType$ = Project.AddFile(FullPath$)
+    MsgBox "The " & FileType$ + " file [" + FullPath$ + "] has been added",
+        vbInformation, "Add File"
+End Sub
+
+=============================================================
+
+Modifying existing files
+
+So how do I modify existing files? The essential code is below.
+The function called in the third line changes for different uses.
+
+    FName$ = RemoveSelectedFile(ThisInstance, VBName$) 'VBIDE interaction
+
+    FText$ = ReadFileAsString$(FName$) 'File I/O
+
+    FText$ = This_AddMenu2File(FText$, lstMenu) 'Custom manipulation
+
+    WriteStringAsFile FName$, FText$ 'File I/O
+
+    ThisInstance.ActiveProject.AddFile FName$ 'VBIDE interaction
+
+The RemoveSelectedFile procedure walks through the ProjectTemplate.Components
+to identify the file to save and to temporarily remove from the project.
+
+The ReadFileAsString procedure opens the file and reads the code in one gulp,
+instead of slowly doing Line Input and concatenating the strings.
+
+The This_AddMenu2File procedure does the desired manipulation.
+
+The WriteFileAsString procedure writes the code in one gulp.
+
+I then add the file back in by calling the ProjectTemplate.AddFile method
+to place the modified copy back into the project.
+
+The RemoveSelectedFile procedure identifies the file by name only. I do not
+know what type of file it is, so I cannot determine if the requested action
+is appropriate.
+
+Because the procedure is in a shared module, I pass the pointer of the VBIDE
+instance to it and receive the full filename when it returns.
+
+If the form is new (not saved), I must call the Component.SaveAs method
+before I call the ProjectTemplate.RemoveComponent method.
+
+Public Function RemoveSelectedFile$(ThisInstance As VBIDE.Application, _
+                                    ByVal VBName$)
+    Dim i%, ProjFiles As VBIDE.Components
+    Set ProjFiles = ThisInstance.ActiveProject.Components
+
+    For i% = 0 To ProjFiles.Count - 1
+        If StrComp(ProjFiles(i%).Name, VBName$, 1) = 0 Then
+            'SaveAs needed if file just created 
+            ProjFiles(i%).SaveAs ProjFiles(i%).FileNames(0) 
+            ThisInstance.ActiveProject.RemoveComponent ProjFiles(i%), True
+            RemoveSelectedFile$ = ProjFiles(i%).FileNames(0)
+            Exit Function
+        End If
+    Next i%
+
+    MsgBox "Unable to save file -- not found.", vbCritical, "Error:" + VBName$
+    Exit Function
+End Function
+
+The ReadFileAsString procedure speeds up the reading of the text file by
+avoiding Line Input. I thought I should show you the code because not many
+people are aware of this trick.
+
+Function ReadFileAsString$(ByVal FileName$)
+    Dim fno%, TMP$, flen&
+    flen& = FileLen(FileName$)
+    TMP$ = Space(flen&)
+    fno% = FreeFile
+
+    Open FileName$ For Binary As #fno%
+        Get #fno%, 1, TMP$  'The easy way!
+    Close fno%
+    ReadFileAsString$ = TMP$
+End Function
+
+The WriteFileAsString procedure uses the same approach as shown below:
+
+Public Function WriteStringAsFile(ByVal FName$, ByVal FText$)
+    Dim fno%
+    fno% = FreeFile
+    Open FName$ For Output As #fno%
+        Print #fno%, FText$
+    Close #fno%
+Exit Function
+
+=============================================================
+
+The This_AddMenu2File procedure makes the changes to the file’s code.
+
+The code does whatever I want it to do — it is not an add-in issue.
+
+I assume that you are skilled with this type of manipulation and will
+skip the code.
